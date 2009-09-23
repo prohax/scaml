@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="sbt">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/project/boot/scala-2.7.5/sbt-0.5.4/sbt_2.7.5-0.5.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
