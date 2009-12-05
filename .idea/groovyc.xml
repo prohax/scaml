@@ -1,9 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project relativePaths="false" version="4">
-  <component name="GroovyCompilerConfiguration">
-    <option name="excludeFromStubGeneration">
-      <ExcludedEntriesConfiguration />
-    </option>
-  </component>
-</project>
+<project version="4" />
 
