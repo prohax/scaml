@@ -17,9 +17,11 @@ object Tags {
     }
   }
 
-  implicit def stringToTag(s: String) = new Tag(Map()) {
+  implicit def stringToTag(s: String) = new span(Map()) {
     override def toString = s
   }
+
+  implicit def pairToMap(p: (Symbol, String)) = Map(p)
 
   case class div() extends Tag(Map())
   case class html(ts: Tag*) extends Tag(Map(), ts: _*)
@@ -28,9 +30,17 @@ object Tags {
   case class title(s: String) extends Tag(Map(), s)
   case class h1(ts: Tag*) extends Tag(Map(), ts: _*)
   case class h2(attr: (Symbol, String), ts: Tag*) extends Tag(Map(attr), ts: _*)
-  case class p(attr: (Symbol, String), ts: Tag*) extends Tag(Map(attr), ts: _*)
+  case class p(attr: Map[Symbol, String], ts: Tag*) extends Tag(attr, ts: _*)
   object p {
-    def apply(ts: Tag*): p = apply('n -> "", ts: _*)
+    def apply(ts: Tag*): p = apply(Map[Symbol, String](), ts: _*)
+  }
+  case class span(attr: Map[Symbol, String], ts: span*) extends Tag(attr, ts: _*)
+  object span {
+    def apply(ts: span*): span = apply(Map[Symbol, String](), ts: _*)
+
+    def apply(a1: (Symbol, String), a2: (Symbol, String), ts: span*): span = apply(Map(a1, a2), ts: _*)
+
+    def apply(a1: (Symbol, String), a2: (Symbol, String), a3: (Symbol, String), ts: span*): span = apply(Map(a1, a2, a3), ts: _*)
   }
 }
 
@@ -50,7 +60,11 @@ object Main {
       body(
         h1(post.title, p("foo")),
         h2('class -> "us'er", post.username),
-        p('class -> "post", post.body)
+        p('class -> "post", post.body),
+        span("span1"),
+        span('class -> "span2", "span2"),
+        span('class -> "span3", 'id -> "win", "span3"),
+        span('class -> "span3", 'id -> "winboat", 'style -> "lol: strong", "span3")
         )
       )
   }
