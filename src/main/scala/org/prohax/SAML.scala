@@ -4,30 +4,33 @@ import collection.mutable.{HashMap, Map}
 import java.lang.String
 
 object Tags {
-  case class Tag(tags: Any*) {
+  case class Tag(attrs: Map[Symbol, String], tags: Tag*) {
     val name = getClass.getSimpleName
 
-    override def toString = if (tags.isEmpty) {
-      "<" + name + "></" + name + ">"
-    } else {
-      "<" + name + ">\n" + tags.map(_.toString).mkString("\n") + "\n</" + name + ">"
+    override def toString = {
+      val tagOpen = "<" + name + attrs.map(kv => " " + kv._1.name + "='" + kv._2.replaceAll("'", "\\\\'") + "'").mkString + ">"
+      if (tags.isEmpty) {
+        tagOpen + "</" + name + ">"
+      } else {
+        "\n" + tagOpen + tags.map(_.toString).mkString + "</" + name + ">\n"
+      }
     }
   }
 
-  case class div() extends Tag()
-  case class html(ts: Tag*) extends Tag(ts: _*)
-  case class head(ts: Tag*) extends Tag(ts: _*)
-  case class body(ts: Tag*) extends Tag(ts: _*)
-  case class title(s: String) extends Tag(s)
-  case class h1(ts: Tag*) extends Tag(ts: _*)
-  case class h2(attr: (Symbol, String), ts: Tag*) extends Tag(ts: _*)
-  case class p(attr: (Symbol, String), ts: Tag*) extends Tag(ts: _*)
-  object p {
-    def apply(ts: Tag*): p = apply('n -> "", ts: _*)
+  implicit def stringToTag(s: String) = new Tag(Map()) {
+    override def toString = s
   }
 
-  implicit def stringToTag(s: String) = new Tag {
-    override def toString = s
+  case class div() extends Tag(Map())
+  case class html(ts: Tag*) extends Tag(Map(), ts: _*)
+  case class head(ts: Tag*) extends Tag(Map(), ts: _*)
+  case class body(ts: Tag*) extends Tag(Map(), ts: _*)
+  case class title(s: String) extends Tag(Map(), s)
+  case class h1(ts: Tag*) extends Tag(Map(), ts: _*)
+  case class h2(attr: (Symbol, String), ts: Tag*) extends Tag(Map(attr), ts: _*)
+  case class p(attr: (Symbol, String), ts: Tag*) extends Tag(Map(attr), ts: _*)
+  object p {
+    def apply(ts: Tag*): p = apply('n -> "", ts: _*)
   }
 }
 
@@ -46,7 +49,7 @@ object Main {
         ),
       body(
         h1(post.title, p("foo")),
-        h2('class -> "user", post.username),
+        h2('class -> "us'er", post.username),
         p('class -> "post", post.body)
         )
       )
