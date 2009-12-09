@@ -1,9 +1,6 @@
 package org.prohax
 
-import collection.mutable.{HashMap, Map}
-import java.lang.String
-
-object Tags {
+object Samlv1 {
   case class Tag(attrs: Map[Symbol, String], tags: Tag*) {
     val name = getClass.getSimpleName
 
@@ -44,28 +41,6 @@ object Tags {
   }
 }
 
-case class Post(username: String, title: String, body: String)
-
-object Main {
-  import Tags._
-  def main(args: Array[String]) {
-    println(render(Post("glen", "opinions", "wack.")))
-  }
-
-  def render(post: Post) = {
-    html(
-      head(
-        title(post.title)
-        ),
-      body(
-        h1(post.title, p("foo")),
-        h2('class -> "us'er", post.username),
-        p('class -> "post", post.body),
-        span("span1"),
-        span('class -> "span2", "span2"),
-        span('class -> "span3", 'id -> "win", "span3"),
-        span('class -> "span3", 'id -> "winboat", 'style -> "lol: strong", "span3")
-        )
-      )
-  }
+object Samlv2 {
+  
 }
