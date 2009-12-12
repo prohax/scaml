@@ -7,7 +7,17 @@ case class Post(username: String, title: String, body: String)
 
 object Main {
   def main(args: Array[String]) {
-    println(render(Post("glen", "opinions", "wack.")))
+    val post = Post("glen", "opinions", "wack.")
+    println(render(post))
+    println(render2(post))
+  }
+
+  def render2(post: Post) = {
+    import Samlv2._
+    html(
+      head(
+        title(post.title)
+        ))
   }
 
   def render(post: Post) = {
@@ -27,4 +37,5 @@ object Main {
         )
       )
   }
+
 }

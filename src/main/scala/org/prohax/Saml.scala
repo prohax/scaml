@@ -1,19 +1,19 @@
 package org.prohax
 
-object Samlv1 {
-  case class Tag(attrs: Map[Symbol, String], tags: Tag*) {
-    val name = getClass.getSimpleName
+case class Tag(attrs: Map[Symbol, String], tags: Tag*) {
+  val name = getClass.getSimpleName
 
-    override def toString = {
-      val tagOpen = "<" + name + attrs.map(kv => " " + kv._1.name + "='" + kv._2.replaceAll("'", "\\\\'") + "'").mkString + ">"
-      if (tags.isEmpty) {
-        tagOpen + "</" + name + ">"
-      } else {
-        "\n" + tagOpen + tags.map(_.toString).mkString + "</" + name + ">\n"
-      }
+  override def toString = {
+    val tagOpen = "<" + name + attrs.map(kv => " " + kv._1.name + "='" + kv._2.replaceAll("'", "\\\\'") + "'").mkString + ">"
+    if (tags.isEmpty) {
+      tagOpen + "</" + name + ">"
+    } else {
+      "\n" + tagOpen + tags.map(_.toString).mkString + "</" + name + ">\n"
     }
   }
+}
 
+object Samlv1 {
   implicit def stringToTag(s: String) = new span(Map()) {
     override def toString = s
   }
@@ -42,5 +42,17 @@ object Samlv1 {
 }
 
 object Samlv2 {
-  
+  case class NamedTag(n: String, as: Map[Symbol, String], ts: Tag*) extends Tag(as, ts:_*) {
+    override val name = n
+  }
+
+  def simpleTag(name: String)(as: Tag*) = {
+    NamedTag(name, Map(), as: _*)
+  }
+
+  implicit def stringToTag(s: String) = new Tag(Map()) {
+    override def toString = s
+  }
+
+  val List(html, head, title) = List("html", "head", "title").map(simpleTag(_) _)
 }
