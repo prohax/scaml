@@ -50,9 +50,14 @@ object Samlv2 {
     NamedTag(name, Map(), as: _*)
   }
 
+  def simpleTagWithAttrs(name: String)(as: Tag*) = {
+    NamedTag(name, Map(), as: _*)
+  }
+
   implicit def stringToTag(s: String) = new Tag(Map()) {
     override def toString = s
   }
 
   val List(html, head, title) = List("html", "head", "title").map(simpleTag(_) _)
+  val List(html, head, title) = List("html", "head", "title").map(simpleTagWithAttrs(_) _)
 }
