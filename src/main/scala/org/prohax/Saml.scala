@@ -42,22 +42,46 @@ object Samlv1 {
 }
 
 object Samlv2 {
-  case class NamedTag(n: String, as: Map[Symbol, String], ts: Tag*) extends Tag(as, ts:_*) {
-    override val name = n
+  trait TagV2 {
+    val attrs: Map[Symbol, String]
+    val tags: Seq[Tag]
+    val name : String
+    
+    override def toString = {
+      val tagOpen = "<" + name + attrs.map(kv => " " + kv._1.name + "='" + kv._2.replaceAll("'", "\\\\'") + "'").mkString + ">"
+      if (tags.isEmpty) {
+        tagOpen + "</" + name + ">"
+      } else {
+        "\n" + tagOpen + tags.map(_.toString).mkString + "</" + name + ">\n"
+      }
+    }
   }
-
-  def simpleTag(name: String)(as: Tag*) = {
-    NamedTag(name, Map(), as: _*)
+  
+  trait NamedByClass {
+    val name = getClass.getSimpleName
   }
-
-  def simpleTagWithAttrs(name: String)(as: Tag*) = {
-    NamedTag(name, Map(), as: _*)
-  }
-
+  
   implicit def stringToTag(s: String) = new Tag(Map()) {
     override def toString = s
   }
+  
+  case class TagBuilder(n : String) {
+    def apply() = new TagV2 {
+      val attrs: Map[Symbol, String] = Map()
+      val name: String = n
+      val tags: Seq[Tag] = Seq()
+    }
+    
+    def apply(as: Tag*) = new TagV2 {
+      val attrs: Map[Symbol, String] = Map()
+      val name = n
+      val tags: Seq[Tag] = as
+    }
+  }
 
-  val List(html, head, title) = List("html", "head", "title").map(simpleTag(_) _)
-  val List(html, head, title) = List("html", "head", "title").map(simpleTagWithAttrs(_) _)
+  val List(html, head, title) = List("html", "head", "title").map(TagBuilder(_))
+  
+  implicit def toOldTag(t: TagV2) : Tag = new Tag(t.attrs, t.tags :_ *) {
+    override val name = t.name
+  }
 }
