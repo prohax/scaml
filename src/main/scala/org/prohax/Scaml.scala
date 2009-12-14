@@ -64,3 +64,20 @@ object Scaml {
     override val name = t.name
   }
 }
+
+object NewScaml {
+  import scala.xml.{TopScope, Elem, UnprefixedAttribute, Text, Null}
+
+  case class SymbolTag(classes: List[String], id: Option[String], name: String) {
+    val elem = Elem(null, name,
+      new UnprefixedAttribute("class", classes.map(Text(_))),
+        id.map(new UnprefixedAttribute("id", Text(_))) getOrElse Null, TopScope)
+
+    override def toString = elem.toString
+
+    def c(s: Symbol) = SymbolTag(s.name :: classes, id, name)
+    def id(s: Symbol) = SymbolTag(classes, Some(s.name), name)
+  }
+
+  implicit def toSymbolTag(s: Symbol) = SymbolTag(Nil, None, s.name)
+}
