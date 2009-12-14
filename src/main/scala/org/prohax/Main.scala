@@ -36,7 +36,7 @@ object Main {
       }
     }
 
-    tags
+    tags.first
 
   }
 //      "head"
