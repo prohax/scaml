@@ -28,10 +28,13 @@ object Scaml {
 
     override def toString = name
   }
-  case class TagFromString(n: String, buffer: ArrayBuffer[Tag]) {
+
+  case class TagFromString(n: String, buffer: ArrayBuffer[Tag], as: Map[Symbol, String]) {
     val state = new ArrayBuffer[Tag]
     state appendAll buffer
     buffer.clear
+
+    def apply(attrs: (Symbol, String)*) = TagFromString(n, buffer, Map(attrs: _*))
 
     def apply(u: Unit) = {
       createSelf()
@@ -44,19 +47,30 @@ object Scaml {
       ()
     }
 
+    def partition(str:String, r: String): (String, Option[String]) = {
+      val i = str.indexOf(r)
+      ("lol", None)
+    }
+
     private def createSelf() {
+      val tokens = n.split("[\\.#]").toList
+      val separators = n.split("[^\\.#]*").toList.filter(_ != "")
+      val as2 = Map(separators.map(_ match {
+          case "." => 'class
+          case "#" => 'id
+      }).zip(tokens.drop(1)) : _*)
       state append new Tag {
-        val attrs = Map[Symbol, String]()
+        val attrs = as ++ as2
         val tags = new ArrayBuffer[Tag]
         tags appendAll buffer
         buffer.clear
-        val name = n
+        val name = tokens.first
       }
       buffer appendAll state
     }
   }
 
-  implicit def stringWithTags(s: String)(implicit ab: ArrayBuffer[Tag]) = TagFromString(s, ab)
+  implicit def stringWithTags(s: String)(implicit ab: ArrayBuffer[Tag]) = TagFromString(s, ab, Map())
 
   implicit def stringToTag(s: String) = StringTag(s)
 

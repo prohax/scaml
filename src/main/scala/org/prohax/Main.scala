@@ -30,9 +30,10 @@ object Main {
         }
       }
       "body" {
-        "h1" {
+        "h1.header"('href -> "http://lol.fase") {
           "Hello, " + post.username
         }
+        "div.spacer#spacerMan" { }
       }
     }
 
