@@ -29,24 +29,27 @@ object Scaml {
     override def toString = name
   }
   case class TagFromString(n: String) {
-    def apply(t: Tag)(implicit ab: ArrayBuffer[Tag]) = {
+    def apply(f: Function1[ArrayBuffer[Tag], ArrayBuffer[Tag]])(implicit ab: ArrayBuffer[Tag]) = {
       val me = new Tag {
         val attrs = Map[Symbol, String]()
         val name = n
-        val tags = List(t)
+        val tags = List()
       }
-      ab append me
-      me
+      
+      (ab2: ArrayBuffer[Tag]) => {
+        ab2 append me
+        ab2
+      }
+    }
+
+    def apply(s: String)(implicit ab: ArrayBuffer[Tag]) = (ab2: ArrayBuffer[Tag]) => {
+      ab2 append StringTag(s)
+      ab2
     }
   }
-  
+
   implicit def stringWithTags(s: String) = TagFromString(s)
 
-  case class StringTagBuilder(name: String) {
-    def s = StringTag(name)
-  }
-
-  implicit def stringToTagViaS(s: String) = StringTagBuilder(s)
   implicit def stringToTag(s: String) = StringTag(s)
 
   case class TagBuilder(n: String) {
@@ -65,6 +68,7 @@ object Scaml {
     def apply(a1: (Symbol, String), ts: Tag*): Tag = apply(Map(a1), ts)
 
     def apply(a1: (Symbol, String), a2: (Symbol, String), ts: Tag*): Tag = apply(Map(a1, a2), ts)
+
     def apply(a1: (Symbol, String), a2: (Symbol, String), a3: (Symbol, String), ts: Tag*): Tag = apply(Map(a1, a2, a3), ts)
   }
 
@@ -90,6 +94,7 @@ object NewScaml {
     override def toString = elem.toString
 
     def c(s: Symbol) = SymbolTag(s.name :: classes, id, name)
+
     def id(s: Symbol) = SymbolTag(classes, Some(s.name), name)
   }
 
