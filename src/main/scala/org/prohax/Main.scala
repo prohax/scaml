@@ -2,6 +2,7 @@ package org.prohax
 
 import Predef.{stringWrapper => _,_}
 import java.lang.String
+import collection.mutable.ArrayBuffer
 
 case class Post(username: String, title: String, body: String)
 
@@ -17,13 +18,28 @@ object Main {
     'head c 'winpants id 'head
   }
 
-  def render3(posts: Post*) = {
+  def render3(post: Post) = {
     import Scaml._
-    "html" {
+
+    implicit val tags = new ArrayBuffer[Tag]
+
+    val view = "html" {
+      "head" {
+        "title" {
+          "Welcome to Win Towne."
+        }
+      }
       "body" {
-        "something"
+        "h1" {
+          "Hello, " + post.username
+        }
       }
     }
+
+    println(tags)
+
+    view
+
   }
 //      "head"
 //      "body.class1.class2" {

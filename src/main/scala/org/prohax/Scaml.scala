@@ -1,5 +1,7 @@
 package org.prohax
 
+import collection.mutable.ArrayBuffer
+
 object Scaml {
   trait Tag {
     val attrs: Map[Symbol, String]
@@ -27,10 +29,14 @@ object Scaml {
     override def toString = name
   }
   case class TagFromString(n: String) {
-    def apply(t: Tag) = new Tag {
-      val attrs = Map[Symbol, String]()
-      val name = n
-      val tags = List(t)
+    def apply(t: Tag)(implicit ab: ArrayBuffer[Tag]) = {
+      val me = new Tag {
+        val attrs = Map[Symbol, String]()
+        val name = n
+        val tags = List(t)
+      }
+      ab append me
+      me
     }
   }
   
