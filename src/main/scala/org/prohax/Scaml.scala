@@ -28,27 +28,32 @@ object Scaml {
 
     override def toString = name
   }
-  case class TagFromString(n: String) {
-    def apply(f: Function1[ArrayBuffer[Tag], ArrayBuffer[Tag]]) = {
-      val me = new Tag {
+  case class TagFromString(n: String, parent: ArrayBuffer[Tag]) {
+    implicit val children = new ArrayBuffer[Tag]
+    println(n)
+    println(parent)
+
+    def apply(u: Unit)(implicit ab: ArrayBuffer[Tag]) = {
+      createSelf()
+      ()
+    }
+
+    def apply(s: String)(implicit ab: ArrayBuffer[Tag]) = {
+      children append StringTag(s)
+      createSelf()
+      ()
+    }
+
+    private def createSelf() {
+      parent append new Tag {
         val attrs = Map[Symbol, String]()
-        val tags = f.apply(new ArrayBuffer[Tag])
+        val tags = children
         val name = n
       }
-      
-      (ab: ArrayBuffer[Tag]) => {
-        ab append me
-        ab
-      }
-    }
-  
-    def apply(s: String) = (ab: ArrayBuffer[Tag]) => {
-      ab append StringTag(s)
-      ab
     }
   }
 
-  implicit def stringWithTags(s: String) = TagFromString(s)
+  implicit def stringWithTags(s: String)(implicit ab: ArrayBuffer[Tag]) = TagFromString(s, ab)
 
   implicit def stringToTag(s: String) = StringTag(s)
 
