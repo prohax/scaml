@@ -16,6 +16,26 @@ object Main {
     'head c 'winpants id 'head
   }
 
+  def render3(posts: Post*) = {
+    import Scaml._
+    "html"(2)
+  }
+//      "head"
+//      "body.class1.class2" {
+//        "ul#posts" {
+//          posts.map { post =>
+//            "li.post" {
+//              post.body
+//            }
+//          }
+//        }
+//        "a.blah"('href -> "lol") {
+//          "link text"
+//        }
+//      }
+//    }
+//  }
+
   def render(post: Post) = {
     import Scaml._
 
