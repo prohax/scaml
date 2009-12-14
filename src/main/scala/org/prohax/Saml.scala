@@ -72,14 +72,32 @@ object Samlv2 {
       val tags: Seq[Tag] = Seq()
     }
     
-    def apply(as: Tag*) = new TagV2 {
+    def apply(ts: Tag*) = new TagV2 {
       val attrs: Map[Symbol, String] = Map()
       val name = n
-      val tags: Seq[Tag] = as
+      val tags: Seq[Tag] = ts
+    }
+
+    def apply(a1: (Symbol, String), ts: Tag*) = new TagV2 {
+      val attrs: Map[Symbol, String] = Map(a1)
+      val name = n
+      val tags: Seq[Tag] = ts
+    }
+
+    def apply(a1: (Symbol, String), a2: (Symbol, String), ts: Tag*) = new TagV2 {
+      val attrs: Map[Symbol, String] = Map(a1, a2)
+      val name = n
+      val tags: Seq[Tag] = ts
+    }
+
+    def apply(a1: (Symbol, String), a2: (Symbol, String), a3: (Symbol, String), ts: Tag*) = new TagV2 {
+      val attrs: Map[Symbol, String] = Map(a1, a2, a3)
+      val name = n
+      val tags: Seq[Tag] = ts
     }
   }
 
-  val List(html, head, title) = List("html", "head", "title").map(TagBuilder(_))
+  val List(html, head, title, body, h1, h2, p, span) = List("html", "head", "title", "body", "h1", "h2", "p", "span").map(TagBuilder(_))
   
   implicit def toOldTag(t: TagV2) : Tag = new Tag(t.attrs, t.tags :_ *) {
     override val name = t.name
