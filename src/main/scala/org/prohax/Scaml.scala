@@ -34,7 +34,7 @@ object Scaml {
     }
   }
   
-//  implicit def stringWithTags(s: String) = TagFromString(s)
+  implicit def stringWithTags(s: String) = TagFromString(s)
 
   case class StringTagBuilder(name: String) {
     def s = StringTag(name)

@@ -1,5 +1,6 @@
 package org.prohax
 
+import Predef.{stringWrapper => _,_}
 import java.lang.String
 
 case class Post(username: String, title: String, body: String)
@@ -7,7 +8,7 @@ case class Post(username: String, title: String, body: String)
 object Main {
   def main(args: Array[String]) {
     val post = Post("glen", "opinions", "wack.")
-    println(render2(post))
+    println(render3(post))
   }
 
   def render2(post: Post): NewScaml.SymbolTag = {
@@ -18,7 +19,11 @@ object Main {
 
   def render3(posts: Post*) = {
     import Scaml._
-    "html"(2)
+    "html" {
+      "body" {
+        "something"
+      }
+    }
   }
 //      "head"
 //      "body.class1.class2" {
