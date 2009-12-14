@@ -20,10 +20,8 @@ object Main {
 
   def render3(post: Post) = {
     import Scaml._
-
-    implicit val tags = new ArrayBuffer[Tag]
-
-    val view = "html" {
+    
+    "html" {
       "head" {
         "title" {
           "Welcome to Win Towne."
@@ -34,12 +32,7 @@ object Main {
           "Hello, " + post.username
         }
       }
-    }
-
-    println(tags)
-
-    view
-
+    }.apply(new ArrayBuffer[Tag])(0)
   }
 //      "head"
 //      "body.class1.class2" {
