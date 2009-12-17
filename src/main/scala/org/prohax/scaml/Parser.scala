@@ -1,7 +1,11 @@
 package org.prohax.scaml
 
-trait ScamlFile
+import scala.xml.{Text, NodeSeq}
+
+trait ScamlFile {
+  def render: NodeSeq
+}
 
 object Parser {
-  def parse(input: String): ScamlFile = new ScamlFile {} 
+  def parse(input: String): ScamlFile = new ScamlFile { def render = Text("")}
 }
