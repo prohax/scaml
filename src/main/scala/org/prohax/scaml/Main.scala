@@ -1,4 +1,4 @@
-package org.prohax
+package org.prohax.scaml
 
 import Predef.{stringWrapper => _, _}
 import java.lang.String

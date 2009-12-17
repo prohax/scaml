@@ -1,4 +1,4 @@
-package org.prohax
+package org.prohax.scaml
 
 import collection.mutable.ArrayBuffer
 
