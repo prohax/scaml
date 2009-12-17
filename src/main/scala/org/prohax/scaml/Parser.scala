@@ -7,24 +7,26 @@ object Constants {
   val DOCTYPE = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">"""
   val EMPTY = """Text("")"""
 
-  def surround(body: => String) = """package org.prohax.scaml.views
+  def surround(name: String,body: => String) = """package org.prohax.scaml.views
 
 import scala.xml._
 import org.prohax.scaml.ScamlFile
 
-object empty extends ScamlFile {
+object """ + name + """ extends ScamlFile {
   def render() = {
     """ + body + """
   }
 }"""
 }
 
+class Foo extends JavaTokenParsers {
+  def go: Parser[String] = header | tag
+  def header: Parser[String] = "!!!".r ^^ (_ => Constants.DOCTYPE)
+  def tag: Parser[String] = "%(\\w*)".r ^^ (_ => "</>")
+}
+
 object Parser {
   private val foo = new Foo
 
-  def parse(input: String) = Constants.surround(foo.parseAll(foo.header, input).getOrElse(Constants.EMPTY))
-}
-
-class Foo extends JavaTokenParsers {
-  def header: Parser[String] = "!!!".r ^^ (_ => Constants.DOCTYPE)
+  def parse(name: String, input: String) = Constants.surround(name, foo.parseAll(foo.header, input).getOrElse(Constants.EMPTY))
 }
