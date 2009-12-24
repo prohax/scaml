@@ -23,11 +23,16 @@ object """ + name + """ extends ScamlFile {
 class Foo extends JavaTokenParsers {
   def go: Parser[String] = header | tag
   def header: Parser[String] = "!!!".r ^^ (_ => "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")")
-  def tag: Parser[String] = "%(\\w*)".r ^^ (_ => "</>")
+  def tag: Parser[String] = "%.*".r ^^ (_ => "<html/>")
 }
 
 object Parser {
   private val foo = new Foo
 
-  def parse(name: String, input: String) = Constants.surround(name, foo.parseAll(foo.header, input).getOrElse(Constants.EMPTY))
+
+  def parse(name: String, input: String) = {
+    val parsed = foo.parseAll(foo.go, input)
+    println("parsed = " + parsed)
+    Constants.surround(name, parsed.getOrElse(Constants.EMPTY))
+  }
 }
