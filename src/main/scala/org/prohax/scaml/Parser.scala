@@ -20,15 +20,15 @@ object """ + name + """ extends ScamlFile {
 }"""
 }
 
-class Foo extends JavaTokenParsers {
+class Foo extends RegexParsers {
   def go: Parser[String] = header | tag
   def header: Parser[String] = "!!!".r ^^ (_ => "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")")
-  def tag: Parser[String] = "%.*".r ^^ (_ => "<html/>")
+  def tag: Parser[String] = "%".r ~> tagName
+  def tagName: Parser[String] = ".*".r ^^ ("<" + _ + "/>")
 }
 
 object Parser {
   private val foo = new Foo
-
 
   def parse(name: String, input: String) = {
     val parsed = foo.parseAll(foo.go, input)
