@@ -19,6 +19,7 @@ object """ + name + """ extends ScamlFile {
   }
 }"""
 
+  def escape(s: String) = "Text(" + Constants.TRIPLE_QUOTES + s + Constants.TRIPLE_QUOTES + ")"
   def indent(indentLevel: Int) = "  " * indentLevel
   def selfClosingTag(indentLevel: Int)(name: String) = indent(indentLevel) + "<" + name + "/>"
   def tagAround(indentLevel: Int, name: String, inner: String, selfClose: Boolean) = if (selfClose && inner.isEmpty) {
@@ -33,26 +34,26 @@ case class ScamlTag(level: Int, name: String)
 case class ScamlParseResult(headers: List[String], tags: List[ScamlTag]) {
   def render = {
     println("headers = " + headers)
-    (headers.map(Constants.indent(2) + _) ::: (if (tags.isEmpty) List(Constants.EMPTY) else {
-      tags.map((x) => Constants.selfClosingTag(2)(x.name))
+    (headers.map(Constants.indent(2) + _) ::: (if (tags.isEmpty) List(Constants.indent(2) + Constants.EMPTY) else {
+      tags.map((x) => Constants.selfClosingTag(x.level + 2)(x.name))
     })).mkString("\n")
   }
 }
 
 class Foo extends RegexParsers {
-  override val whiteSpace = "".r
+  override val whiteSpace = """[\n\r]*""".r
   def go: Parser[ScamlParseResult] = opt(header) ~ rep(tagLine) ^^ { (x) =>
     ScamlParseResult(x._1.map(List(_)).getOrElse(Nil), x._2)
   }
-  def header: Parser[String] = "!!!".r ^^ (_ => "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")")
-  def tagLine: Parser[ScamlTag] = "\n".r ~> rep(indent) ~ tagName ^^ { (x) =>
+  def header: Parser[String] = "!!!".r ^^ (_ => Constants.escape(Constants.DOCTYPE))
+  def tagLine: Parser[ScamlTag] = rep(indent) ~ tag ^^ { (x) =>
     println("x = " + x)
+//    ScamlTag(0, x)
     ScamlTag(x._1.length, x._2)
   }
   def indent: Parser[String] = "  ".r
-//  def tag: Parser[String] = "^%".r ~> tagName ~ rep(subtag) ^^ ((x) => Constants.tagAround(2, x._1, x._2.mkString("\n"), true))
+  def tag: Parser[String] = "%".r ~> tagName
   def tagName: Parser[String] = """\w+""".r
-//  def subtag: Parser[String] = """\n  %""".r ~> tagName ^^ Constants.selfClosingTag(3)
 }
 
 object Parser {
@@ -60,6 +61,7 @@ object Parser {
 
   def parse(name: String, input: String) = {
     val parsed = foo.parseAll(foo.go, input)
-    Constants.surround(name, if (parsed.successful) parsed.get.render else Constants.indent(2) + "Text(\"" + parsed.toString + "\")")
+    println("parsed = " + parsed)
+    Constants.surround(name, if (parsed.successful) parsed.get.render else Constants.indent(2) + Constants.escape(parsed.toString))
   }
 }
