@@ -33,8 +33,8 @@ class Foo extends RegexParsers {
   override val whiteSpace = "".r
   def go: Parser[List[String]] = header | rep1(tag)
   def header: Parser[List[String]] = "!!!".r ^^ (_ => List(Constants.indent(2) + "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")"))
-  def tag: Parser[String] = "^%".r ~> closedTag ~ rep(subtag) ^^ ((x) => Constants.tagAround(2, x._1, x._2.mkString, true))
-  def closedTag: Parser[String] = ".*".r
+  def tag: Parser[String] = "^%".r ~> closedTag ~ rep(subtag) ^^ ((x) => Constants.tagAround(2, x._1, x._2.mkString("\n"), true))
+  def closedTag: Parser[String] = """\w+""".r
   def subtag: Parser[String] = """\n  %""".r ~> ".*".r ^^ Constants.selfClosingTag(3)
 }
 

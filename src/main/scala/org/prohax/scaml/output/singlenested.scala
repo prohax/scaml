@@ -6,6 +6,7 @@ import org.prohax.scaml.ScamlFile
 object singlenested extends ScamlFile {
   def render() = {
     <html>
+      <head/>
       <body/>
     </html>
   }
