@@ -30,14 +30,21 @@ object """ + name + """ extends ScamlFile {
 }
 
 case class ScamlTag(level: Int, name: String)
-case class ScamlParseResult(headers: List[String], tags: List[ScamlTag])
+case class ScamlParseResult(headers: List[String], tags: List[ScamlTag]) {
+  def render = {
+    println("headers = " + headers)
+    (headers.map(Constants.indent(2) + _) ::: (if (tags.isEmpty) List(Constants.EMPTY) else {
+      tags.map((x) => Constants.selfClosingTag(2)(x.name))
+    })).mkString("\n")
+  }
+}
 
 class Foo extends RegexParsers {
   override val whiteSpace = "".r
   def go: Parser[ScamlParseResult] = opt(header) ~ rep(tagLine) ^^ { (x) =>
-    ScamlParseResult(x._1.getOrElse(Nil), x._2)
+    ScamlParseResult(x._1.map(List(_)).getOrElse(Nil), x._2)
   }
-  def header: Parser[List[String]] = "!!!".r ^^ (_ => List(Constants.indent(2) + "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")"))
+  def header: Parser[String] = "!!!".r ^^ (_ => "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")")
   def tagLine: Parser[ScamlTag] = "\n" ~> rep(indent) ~ tagName ^^ { (x) =>
     ScamlTag(x._1.length, x._2)
   }
@@ -51,8 +58,7 @@ object Parser {
   private val foo = new Foo
 
   def parse(name: String, input: String) = {
-    val parsed = foo.parseAll(foo.go, input).getOrElse(ScamlParseResult(Nil, List(ScamlTag(0, Constants.EMPTY))))
-    println("parsed = " + parsed)
-    Constants.surround(name, parsed.toString)
+    val parsed: String = foo.parseAll(foo.go, input).map(_.render).getOrElse(Constants.indent(2) + Constants.EMPTY)
+    Constants.surround(name, parsed)
   }
 }
