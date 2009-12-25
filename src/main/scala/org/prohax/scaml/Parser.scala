@@ -15,34 +15,34 @@ import org.prohax.scaml.ScamlFile
 
 object """ + name + """ extends ScamlFile {
   def render() = {
-    """ + body + """
+""" + body + """
   }
 }"""
 
-  def selfClosingTag(name: String) = "<" + name + "/>"
-  def emptyTag(name: String) = tagAround(name, "")
-  def tagAround(name: String, inner: String, selfClose: Boolean) = if (selfClose && inner.isEmpty) {
-    selfClosingTag(name)
+  def indent(indentLevel: Int) = "  " * indentLevel
+  def selfClosingTag(indentLevel: Int)(name: String) = indent(indentLevel) + "<" + name + "/>"
+  def tagAround(indentLevel: Int, name: String, inner: String, selfClose: Boolean) = if (selfClose && inner.isEmpty) {
+    selfClosingTag(indentLevel)(name)
   } else {
-    "<" + name + ">" + inner + "</" + name + ">"
+    indent(indentLevel) + "<" + name + ">\n" + inner + "\n" + indent(indentLevel) + "</" + name + ">"
   }
-  def tagAround(name: String, inner: String): String = tagAround(name, inner, false)
+  def tagAround(indentLevel: Int, name: String, inner: String): String = tagAround(indentLevel, name, inner, false)
 }
 
 class Foo extends RegexParsers {
   override val whiteSpace = "".r
   def go: Parser[List[String]] = header | rep1(tag)
-  def header: Parser[List[String]] = "!!!".r ^^ (_ => List("Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")"))
-  def tag: Parser[String] = "^%".r ~> closedTag ~ rep(subtag) ^^ ((x) => Constants.tagAround(x._1, x._2.mkString, true))
+  def header: Parser[List[String]] = "!!!".r ^^ (_ => List(Constants.indent(2) + "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")"))
+  def tag: Parser[String] = "^%".r ~> closedTag ~ rep(subtag) ^^ ((x) => Constants.tagAround(2, x._1, x._2.mkString, true))
   def closedTag: Parser[String] = ".*".r
-  def subtag: Parser[String] = """\n  %""".r ~> ".*".r ^^ Constants.selfClosingTag
+  def subtag: Parser[String] = """\n  %""".r ~> ".*".r ^^ Constants.selfClosingTag(3)
 }
 
 object Parser {
   private val foo = new Foo
 
   def parse(name: String, input: String) = {
-    val parsed = foo.parseAll(foo.go, input).getOrElse(List(Constants.EMPTY))
+    val parsed = foo.parseAll(foo.go, input).getOrElse(List(Constants.indent(2) + Constants.EMPTY))
     println("parsed = " + parsed)
     Constants.surround(name, parsed.mkString)
   }
