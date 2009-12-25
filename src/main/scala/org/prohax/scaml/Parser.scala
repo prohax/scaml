@@ -20,15 +20,22 @@ object """ + name + """ extends ScamlFile {
 }"""
 
   def selfClosingTag(name: String) = "<" + name + "/>"
-  def emptyTag(name: String) = "<" + name + "></" + name + ">"
+  def emptyTag(name: String) = tagAround(name, "")
+  def tagAround(name: String, inner: String, selfClose: Boolean) = if (selfClose && inner.isEmpty) {
+    selfClosingTag(name)
+  } else {
+    "<" + name + ">" + inner + "</" + name + ">"
+  }
+  def tagAround(name: String, inner: String): String = tagAround(name, inner, false)
 }
 
 class Foo extends RegexParsers {
-  def go: Parser[List[String]] = header | rep1(tag) ^^ ((x: List[List[String]]) => x.flatten)
+  override val whiteSpace = "".r
+  def go: Parser[List[String]] = header | rep1(tag)
   def header: Parser[List[String]] = "!!!".r ^^ (_ => List("Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")"))
-  def tag: Parser[List[String]] = "^%".r ~> closedTag ~ rep(subtag) ^^ ((x) => x._1 :: x._2)
-  def closedTag: Parser[String] = ".*".r ^^ Constants.selfClosingTag
-  def subtag: Parser[String] = "\\.\\.%".r ~> ".*".r ^^ Constants.emptyTag
+  def tag: Parser[String] = "^%".r ~> closedTag ~ rep(subtag) ^^ ((x) => Constants.tagAround(x._1, x._2.mkString, true))
+  def closedTag: Parser[String] = ".*".r
+  def subtag: Parser[String] = """\n  %""".r ~> ".*".r ^^ Constants.selfClosingTag
 }
 
 object Parser {
