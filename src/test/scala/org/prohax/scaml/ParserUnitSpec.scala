@@ -35,5 +35,11 @@ class ParserUnitSpec extends Specification {
           NestedTag("head", List(
             NestedTag("title", Nil)))))))
     }
+    "handle multiples at base level" in {
+      ScamlParseResult.nestTags(List(a, b, ScamlTag(0, "lol"))) must beEqualTo(
+        List(NestedTag("lol", Nil),
+        NestedTag("html", List(
+          NestedTag("head", Nil)))))
+    }
   }
 }
