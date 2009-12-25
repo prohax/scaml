@@ -33,9 +33,9 @@ class Foo extends RegexParsers {
   override val whiteSpace = "".r
   def go: Parser[List[String]] = header | rep1(tag)
   def header: Parser[List[String]] = "!!!".r ^^ (_ => List(Constants.indent(2) + "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")"))
-  def tag: Parser[String] = "^%".r ~> closedTag ~ rep(subtag) ^^ ((x) => Constants.tagAround(2, x._1, x._2.mkString("\n"), true))
-  def closedTag: Parser[String] = """\w+""".r
-  def subtag: Parser[String] = """\n  %""".r ~> ".*".r ^^ Constants.selfClosingTag(3)
+  def tag: Parser[String] = "^%".r ~> tagName ~ rep(subtag) ^^ ((x) => Constants.tagAround(2, x._1, x._2.mkString("\n"), true))
+  def tagName: Parser[String] = """\w+""".r
+  def subtag: Parser[String] = """\n  %""".r ~> tagName ^^ Constants.selfClosingTag(3)
 }
 
 object Parser {
