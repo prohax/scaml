@@ -30,6 +30,8 @@ object """ + name + """ extends ScamlFile {
   def tagAround(indentLevel: Int, name: String, inner: String): String = tagAround(indentLevel, name, inner, false)
 }
 
+case class NestedTag(name: String, subtags: List[NestedTag])
+
 case class ScamlTag(level: Int, name: String)
 case class ScamlParseResult(headers: List[String], tags: List[ScamlTag]) {
   def render = {
@@ -37,6 +39,14 @@ case class ScamlParseResult(headers: List[String], tags: List[ScamlTag]) {
     (headers.map(Constants.indent(2) + _) ::: (if (tags.isEmpty) List(Constants.indent(2) + Constants.EMPTY) else {
       tags.map((x) => Constants.selfClosingTag(x.level + 2)(x.name))
     })).mkString("\n")
+  }
+}
+object ScamlParseResult {
+  def nestTags(tags: List[ScamlTag]) = tags match {
+    case Nil => Nil
+    case head :: rest => {
+      List(NestedTag(head.name, rest.map((r) => NestedTag(r.name, Nil))))
+    }
   }
 }
 
