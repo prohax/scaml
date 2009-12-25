@@ -29,21 +29,30 @@ object """ + name + """ extends ScamlFile {
   def tagAround(indentLevel: Int, name: String, inner: String): String = tagAround(indentLevel, name, inner, false)
 }
 
+case class ScamlTag(level: Int, name: String)
+case class ScamlParseResult(headers: List[String], tags: List[ScamlTag])
+
 class Foo extends RegexParsers {
   override val whiteSpace = "".r
-  def go: Parser[List[String]] = header | rep1(tag)
+  def go: Parser[ScamlParseResult] = opt(header) ~ rep(tagLine) ^^ { (x) =>
+    ScamlParseResult(x._1.getOrElse(Nil), x._2)
+  }
   def header: Parser[List[String]] = "!!!".r ^^ (_ => List(Constants.indent(2) + "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")"))
-  def tag: Parser[String] = "^%".r ~> tagName ~ rep(subtag) ^^ ((x) => Constants.tagAround(2, x._1, x._2.mkString("\n"), true))
+  def tagLine: Parser[ScamlTag] = "\n" ~> rep(indent) ~ tagName ^^ { (x) =>
+    ScamlTag(x._1.length, x._2)
+  }
+  def indent: Parser[String] = "  ".r
+//  def tag: Parser[String] = "^%".r ~> tagName ~ rep(subtag) ^^ ((x) => Constants.tagAround(2, x._1, x._2.mkString("\n"), true))
   def tagName: Parser[String] = """\w+""".r
-  def subtag: Parser[String] = """\n  %""".r ~> tagName ^^ Constants.selfClosingTag(3)
+//  def subtag: Parser[String] = """\n  %""".r ~> tagName ^^ Constants.selfClosingTag(3)
 }
 
 object Parser {
   private val foo = new Foo
 
   def parse(name: String, input: String) = {
-    val parsed = foo.parseAll(foo.go, input).getOrElse(List(Constants.indent(2) + Constants.EMPTY))
+    val parsed = foo.parseAll(foo.go, input).getOrElse(ScamlParseResult(Nil, List(ScamlTag(0, Constants.EMPTY))))
     println("parsed = " + parsed)
-    Constants.surround(name, parsed.mkString)
+    Constants.surround(name, parsed.toString)
   }
 }
