@@ -18,21 +18,25 @@ object """ + name + """ extends ScamlFile {
     """ + body + """
   }
 }"""
+
+  def selfClosingTag(name: String) = "<" + name + "/>"
+  def emptyTag(name: String) = "<" + name + "></" + name + ">"
 }
 
 class Foo extends RegexParsers {
-  def go: Parser[String] = header | tag
-  def header: Parser[String] = "!!!".r ^^ (_ => "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")")
-  def tag: Parser[String] = "%".r ~> tagName
-  def tagName: Parser[String] = ".*".r ^^ ("<" + _ + "/>")
+  def go: Parser[List[String]] = header | rep1(tag) ^^ ((x: List[List[String]]) => x.flatten)
+  def header: Parser[List[String]] = "!!!".r ^^ (_ => List("Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")"))
+  def tag: Parser[List[String]] = "^%".r ~> closedTag ~ rep(subtag) ^^ ((x) => x._1 :: x._2)
+  def closedTag: Parser[String] = ".*".r ^^ Constants.selfClosingTag
+  def subtag: Parser[String] = "\\.\\.%".r ~> ".*".r ^^ Constants.emptyTag
 }
 
 object Parser {
   private val foo = new Foo
 
   def parse(name: String, input: String) = {
-    val parsed = foo.parseAll(foo.go, input)
+    val parsed = foo.parseAll(foo.go, input).getOrElse(List(Constants.EMPTY))
     println("parsed = " + parsed)
-    Constants.surround(name, parsed.getOrElse(Constants.EMPTY))
+    Constants.surround(name, parsed.mkString)
   }
 }
