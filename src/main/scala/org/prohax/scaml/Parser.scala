@@ -45,7 +45,20 @@ object ScamlParseResult {
   def nestTags(tags: List[ScamlTag]) = tags match {
     case Nil => Nil
     case head :: rest => {
-      List(NestedTag(head.name, rest.map((r) => NestedTag(r.name, Nil))))
+      List(recursiveNest(NestedTag(head.name, Nil), head.level, rest)._1)
+    }
+  }
+  private def recursiveNest(parent: NestedTag, parentLevel: Int, remaining: List[ScamlTag]): (NestedTag, List[ScamlTag]) = {
+    remaining match {
+      case Nil => (parent, Nil)
+      case next :: rest => {
+        if (next.level > parentLevel) {
+          val (child, more) = recursiveNest(NestedTag(next.name, Nil), next.level, rest)
+          (NestedTag(parent.name, child :: parent.subtags), more)
+        } else {
+          (parent, remaining)
+        }
+      }
     }
   }
 }
