@@ -45,7 +45,8 @@ class Foo extends RegexParsers {
     ScamlParseResult(x._1.map(List(_)).getOrElse(Nil), x._2)
   }
   def header: Parser[String] = "!!!".r ^^ (_ => "Text(" + Constants.TRIPLE_QUOTES + Constants.DOCTYPE + Constants.TRIPLE_QUOTES + ")")
-  def tagLine: Parser[ScamlTag] = "\n" ~> rep(indent) ~ tagName ^^ { (x) =>
+  def tagLine: Parser[ScamlTag] = "\n".r ~> rep(indent) ~ tagName ^^ { (x) =>
+    println("x = " + x)
     ScamlTag(x._1.length, x._2)
   }
   def indent: Parser[String] = "  ".r
@@ -58,7 +59,7 @@ object Parser {
   private val foo = new Foo
 
   def parse(name: String, input: String) = {
-    val parsed: String = foo.parseAll(foo.go, input).map(_.render).getOrElse(Constants.indent(2) + Constants.EMPTY)
-    Constants.surround(name, parsed)
+    val parsed = foo.parseAll(foo.go, input)
+    Constants.surround(name, if (parsed.successful) parsed.get.render else Constants.indent(2) + "Text(\"" + parsed.toString + "\")")
   }
 }
