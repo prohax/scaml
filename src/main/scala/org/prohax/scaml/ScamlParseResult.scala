@@ -33,8 +33,10 @@ object ScamlParseResult {
 
 case class NestedTag(name: String, subtags: List[NestedTag]) {
   def toStringWithIndent(indent: Int): String = Constants.indent(indent) + {
-    if (subtags.isEmpty) "<" + name + "/>" else {
-      "<" + name + ">\n" + subtags.reverseMap(_.toStringWithIndent(indent + 1)).mkString("\n") + "\n" + Constants.indent(indent) + "</" + name + ">"
+    if (subtags.isEmpty) "<" + name + attrs + "/>" else {
+      "<" + name + attrs + ">\n" + subtags.reverseMap(_.toStringWithIndent(indent + 1)).mkString("\n") + "\n" + Constants.indent(indent) + "</" + name + ">"
     }
   }
+
+  private def attrs = ""
 }
