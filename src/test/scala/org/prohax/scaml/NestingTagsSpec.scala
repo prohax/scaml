@@ -2,7 +2,7 @@ package org.prohax.scaml
 
 import org.specs._
 
-class ParserUnitSpec extends Specification {
+class NestingTagsSpec extends Specification {
   val a = ScamlTag(0, "html")
   val b = ScamlTag(1, "head")
   val c = ScamlTag(2, "title")
