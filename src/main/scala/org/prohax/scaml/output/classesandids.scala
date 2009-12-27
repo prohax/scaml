@@ -10,16 +10,16 @@ object classesandids extends ScamlFile {
         <title/>
       </head>
       <body>
-        <div id="first">
-          <h1 class="megaBig"/>
-          <div id="name" class="super win">
-            <p>
+        <div id='first'>
+          <h1 class='megaBig'/>
+          <div id='name' class='super win'>
+            <p class='thin'>
               <strong/>
             </p>
-            <p/>
+            <p class='wide'/>
           </div>
         </div>
-        <div id="last"/>
+        <div id='last'/>
       </body>
     </html>
   }

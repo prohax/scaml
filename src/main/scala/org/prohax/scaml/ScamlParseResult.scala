@@ -38,5 +38,8 @@ case class NestedTag(tag: ScamlTag, subtags: List[NestedTag]) {
     }
   }
 
-  private def attrs = ""
+  private def attrs = tag.id.map(id => " id='" + id + "'").getOrElse("") + (tag.classes match {
+    case Nil => ""
+    case classes => " class='" + classes.mkString(" ") + "'"
+  })
 }
