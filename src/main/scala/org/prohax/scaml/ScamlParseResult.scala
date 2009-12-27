@@ -13,10 +13,11 @@ object """ + name + """ extends ScamlFile {""" + renderHeaders + """
   }
 }"""
 
-  private def renderBody = (tags match {
-    case Nil => List(Constants.indent(2) + Constants.EMPTY)
-    case _ => nestTags(tags).map(_.toStringWithIndent(2))
-  }).mkString("\n")
+  private def renderBody = if (tags.isEmpty || tags.find(!_.isEmpty).isEmpty) {
+    Constants.indent(2) + Constants.EMPTY
+  } else {
+    nestTags(tags).map(_.toStringWithIndent(2)).mkString("\n")
+  }
 
   private def renderHeaders = headers match {
     case Nil => ""

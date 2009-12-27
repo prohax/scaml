@@ -3,20 +3,19 @@ package org.prohax.scaml
 import scala.util.parsing.combinator._
 
 class Parser extends RegexParsers {
-  override val whiteSpace = """[\n\r]*""".r
+  override val whiteSpace = "".r
+  val newline = """[\n\r]+""".r
 
   def start: Parser[ScamlParseResult] = opt(header) ~ rep(line) ^^ (x =>
-    ScamlParseResult(x._1.map(List(_)).getOrElse(Nil), x._2.filter(_.isDefined).map(_.get)))
+    ScamlParseResult(x._1.map(List(_)).getOrElse(Nil), x._2))
 
-  def header: Parser[String] = "!!!".r ^^ (_ => Constants.DOCTYPE)
+  def header: Parser[String] = newline ~> "!!!".r ^^ (_ => Constants.DOCTYPE)
 
-  def line: Parser[Option[ScamlTag]] = emptyLine | tagLine
+  def line: Parser[ScamlTag] = newline ~> tagLine
 
-  def emptyLine: Parser[Option[ScamlTag]] = """^\s*$""".r ^^ (_ => None)
-
-  def tagLine: Parser[Option[ScamlTag]] = rep(indent) ~ opt(tag) ~ rep(cls) ~ opt(id) ~ rep(cls) ~ opt(text) ^^
+  def tagLine: Parser[ScamlTag] = rep(indent) ~ opt(tag) ~ rep(cls) ~ opt(id) ~ rep(cls) ~ opt(text) ^^
           {case indents ~ tag ~ cls1 ~ id ~ cls2 ~ text =>
-            Some(new ScamlTag(indents.length, tag, id, cls1 ::: cls2, text))}
+            new ScamlTag(indents.length, tag, id, cls1 ::: cls2, text)}
 
   def indent: Parser[String] = "  ".r
 
@@ -35,7 +34,8 @@ object Parser {
   private val parser = new Parser
 
   def parse(name: String, input: String) = {
-    val parsed = parser.parseAll(parser.start, input)
+    //need a prepended newline here so each line can consume exactly one. There's probably a better way.
+    val parsed = parser.parseAll(parser.start, "\n" + input)
     if (parsed.successful) parsed.get.render(name) else parsed.toString
   }
 }
