@@ -31,7 +31,8 @@ object ScamlParserSpec extends Specification {
       ("doublynested", () => doublynested.renderString),
       ("emptyfile", () => emptyfile.renderString),
       ("html", () => html.renderString),
-      ("literals", () => literals.renderString)
+      ("literals", () => literals.renderString),
+      ("tag_parsing", () => tag_parsing.renderString)
     ).foreach(x => {
       "work for " + x._1 in {
         x._2() must beEqualTo(read(outputDir + x._1 + ".html"))
