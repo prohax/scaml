@@ -1,6 +1,7 @@
 package org.prohax.scaml
 
-case class ScamlParseResult(headers: List[String], tags: List[ScamlTag]) {
+case class ScamlParseResult(headers: List[String], tagsIncludingEmpty: List[ScamlTag]) {
+  private val tags = tagsIncludingEmpty.filter(!_.isEmpty)
   import ScamlParseResult._
   def render(name: String) = """package org.prohax.scaml.output
 
@@ -13,10 +14,10 @@ object """ + name + """ extends ScamlFile {""" + renderHeaders + """
   }
 }"""
 
-  private def renderBody = if (tags.isEmpty || tags.find(!_.isEmpty).isEmpty) {
+  private def renderBody = if (tags.isEmpty) {
     Constants.indent(2) + Constants.EMPTY
   } else {
-    nestTags(tags).map(_.toStringWithIndent(2)).mkString("\n")
+    nestTags(tags).reverseMap(_.toStringWithIndent(2)).mkString("\n")
   }
 
   private def renderHeaders = headers match {

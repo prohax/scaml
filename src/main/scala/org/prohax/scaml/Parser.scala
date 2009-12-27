@@ -21,7 +21,7 @@ class Parser extends RegexParsers {
 
   def tag: Parser[String] = "%".r ~> word
 
-  def word: Parser[String] = """\w+""".r
+  def word: Parser[String] = """[\w-:]+""".r
 
   def id: Parser[String] = """#""".r ~> word
 
