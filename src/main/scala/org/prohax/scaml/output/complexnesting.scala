@@ -4,7 +4,7 @@ import scala.xml._
 import org.prohax.scaml.ScamlFile
 
 object complexnesting extends ScamlFile {
-  def render() = {
+  def renderXml() = {
     <html>
       <head>
         <title/>

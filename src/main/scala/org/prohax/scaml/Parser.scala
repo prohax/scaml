@@ -6,7 +6,7 @@ class Parser extends RegexParsers {
   override val whiteSpace = """[\n\r]*""".r
   def start: Parser[ScamlParseResult] = opt(header) ~ rep(tagLine) ^^ (x =>
     ScamlParseResult(x._1.map(List(_)).getOrElse(Nil), x._2))
-  def header: Parser[String] = "!!!".r ^^ (_ => Constants.escape(Constants.DOCTYPE))
+  def header: Parser[String] = "!!!".r ^^ (_ => Constants.DOCTYPE)
   def tagLine: Parser[ScamlTag] = rep(indent) ~ tag ~ rep(cls) ~ opt(id) ~ rep(cls) ^^
           { case indents ~ tag ~ cls1 ~ id ~ cls2 => ScamlTag(indents.length,tag,id,cls1 ::: cls2) }
   def indent: Parser[String] = "  ".r
@@ -21,6 +21,6 @@ object Parser {
 
   def parse(name: String, input: String) = {
     val parsed = parser.parseAll(parser.start, input)
-    Constants.surround(name, if (parsed.successful) parsed.get.render else Constants.indent(2) + Constants.escape(parsed.toString))
+    if (parsed.successful) parsed.get.render(name) else parsed.toString
   }
 }

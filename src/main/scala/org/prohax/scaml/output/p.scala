@@ -4,7 +4,7 @@ import scala.xml._
 import org.prohax.scaml.ScamlFile
 
 object p extends ScamlFile {
-  def render() = {
+  def renderXml() = {
     <p/>
   }
 }

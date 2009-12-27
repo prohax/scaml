@@ -9,11 +9,26 @@ object ScamlTag {
 
 case class ScamlParseResult(headers: List[String], tags: List[ScamlTag]) {
   import ScamlParseResult._
-  def render = {
-    val tagLines = if (tags.isEmpty) List(Constants.indent(2) + Constants.EMPTY) else {
-      nestTags(tags).map(_.toStringWithIndent(2))
-    }
-    (headers.map(Constants.indent(2) + _) ::: tagLines).mkString("\n")
+  def render(name: String) = """package org.prohax.scaml.output
+
+import scala.xml._
+import org.prohax.scaml.ScamlFile
+
+object """ + name + """ extends ScamlFile {""" + renderHeaders + """
+  def renderXml() = {
+""" + renderBody + """
+  }
+}"""
+
+  private def renderBody = (tags match {
+    case Nil => List(Constants.indent(2) + Constants.EMPTY)
+    case _ => nestTags(tags).map(_.toStringWithIndent(2))
+  }).mkString("\n")
+
+  private def renderHeaders = headers match {
+    case Nil => ""
+    case _ => """
+  override def headers = """ + Constants.TRIPLE_QUOTES + headers.mkString("\n") + Constants.TRIPLE_QUOTES + "\n"
   }
 }
 

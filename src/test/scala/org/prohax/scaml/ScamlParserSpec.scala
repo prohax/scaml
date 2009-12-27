@@ -24,9 +24,16 @@ object ScamlParserSpec extends Specification {
 
   "The renderer" should {
     import output._
-    List(("classesandids", classesandids.render())).foreach(x => {
+    List(
+      ("classesandids", () => classesandids.renderString),
+      ("complexnesting", () => complexnesting.renderString),
+      ("doctype", () => doctype.renderString),
+      ("doublynested", () => doublynested.renderString),
+      ("emptyfile", () => emptyfile.renderString),
+      ("html", () => html.renderString)
+    ).foreach(x => {
       "work for " + x._1 in {
-        ScamlFile.render(x._2) must beEqualTo(read(outputDir + x._1 + ".html"))
+        x._2() must beEqualTo(read(outputDir + x._1 + ".html"))
       }
     })
   }
