@@ -24,7 +24,7 @@ object ScamlParseResult {
     case Nil => (parent, Nil)
     case next :: rest => if (next.level > parent.tag.level) {
       val (child, more) = recursiveNest(NestedTag(next, Nil), rest)
-      recursiveNest(NestedTag(parent.tag, child :: parent.subtags), more)
+        recursiveNest(NestedTag(parent.tag, child :: parent.subtags), more)
     } else {
       (parent, remaining)
     }

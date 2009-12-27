@@ -3,16 +3,30 @@ package org.prohax.scaml
 import org.specs._
 import scala.io.Source
 import java.io.File
+import scala.xml.Xhtml
 
 object ScamlParserSpec extends Specification {
   val sampleDir = "src/test/sampledata/"
+  val inputDir = sampleDir + "input/"
+  val outputDir = sampleDir + "output/"
+
+  def read(filename: String) = Source.fromFile(filename).getLines.mkString
 
   "The parser" should {
-    new File("src/test/sampledata/input").listFiles.foreach((f: File) => {
+    new File(inputDir).listFiles.foreach((f: File) => {
       "read, parse and output for " + f.getName in {
         val name = f.getName.replaceFirst("\\.scaml$", "")
         Parser.parse(name, Source.fromFile(f).getLines.mkString) must beEqualTo(
-          Source.fromFile("src/main/scala/org/prohax/scaml/output/" + name + ".scala").getLines.mkString)
+          read("src/main/scala/org/prohax/scaml/output/" + name + ".scala"))
+      }
+    })
+  }
+
+  "The renderer" should {
+    import output._
+    List(("classesandids", classesandids.render())).foreach(x => {
+      "work for " + x._1 in {
+        ScamlFile.render(x._2) must beEqualTo(read(outputDir + x._1 + ".html"))
       }
     })
   }

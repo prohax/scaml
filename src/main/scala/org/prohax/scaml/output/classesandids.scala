@@ -17,6 +17,7 @@ object classesandids extends ScamlFile {
               <strong/>
             </p>
             <p class='wide'/>
+            <br/>
           </div>
         </div>
         <div id='last'/>
