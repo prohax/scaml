@@ -26,5 +26,14 @@ class ParsingUnitSpec extends Specification {
       parse("  %body.main").get must beEqualTo(ScamlTag(1, "body", None, List("main")))
       parse("  %body.main.ima.lol.too").get must beEqualTo(ScamlTag(1, "body", None, List("main", "ima", "lol", "too")))
     }
+
+    "match classes and divs" in {
+      parse("%p#header.header").get must beEqualTo(ScamlTag(0, "p", Some("header"), List("header")))
+      parse("  %body#something.main").get must beEqualTo(ScamlTag(1, "body", Some("something"), List("main")))
+      parse("  %body#is.main.ima.lol.too").get must beEqualTo(ScamlTag(1, "body", Some("is"), List("main", "ima", "lol", "too")))
+      // needed?
+      parse("  %body.main.ima.lol.too#end").get must beEqualTo(ScamlTag(1, "body", Some("end"), List("main", "ima", "lol", "too")))
+      parse("  %body.main.ima#middle.lol.too").get must beEqualTo(ScamlTag(1, "body", Some("middle"), List("main", "ima", "lol", "too")))
+    }
   }
 }
