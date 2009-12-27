@@ -18,23 +18,23 @@ case class ScamlParseResult(headers: List[String], tags: List[ScamlTag]) {
 }
 
 object ScamlParseResult {
-  def nestTags(tags: List[ScamlTag]) = recursiveNest(NestedTag("", Nil), Math.MIN_INT, tags)._1.subtags
+  def nestTags(tags: List[ScamlTag]) = recursiveNest(NestedTag(ScamlTag(Math.MIN_INT, ""), Nil), tags)._1.subtags
 
-  private def recursiveNest(parent: NestedTag, parentLevel: Int, remaining: List[ScamlTag]): (NestedTag, List[ScamlTag]) = remaining match {
+  private def recursiveNest(parent: NestedTag, remaining: List[ScamlTag]): (NestedTag, List[ScamlTag]) = remaining match {
     case Nil => (parent, Nil)
-    case next :: rest => if (next.level > parentLevel) {
-      val (child, more) = recursiveNest(NestedTag(next.name, Nil), next.level, rest)
-      recursiveNest(NestedTag(parent.name, child :: parent.subtags), parentLevel, more)
+    case next :: rest => if (next.level > parent.tag.level) {
+      val (child, more) = recursiveNest(NestedTag(next, Nil), rest)
+      recursiveNest(NestedTag(parent.tag, child :: parent.subtags), more)
     } else {
       (parent, remaining)
     }
   }
 }
 
-case class NestedTag(name: String, subtags: List[NestedTag]) {
+case class NestedTag(tag: ScamlTag, subtags: List[NestedTag]) {
   def toStringWithIndent(indent: Int): String = Constants.indent(indent) + {
-    if (subtags.isEmpty) "<" + name + attrs + "/>" else {
-      "<" + name + attrs + ">\n" + subtags.reverseMap(_.toStringWithIndent(indent + 1)).mkString("\n") + "\n" + Constants.indent(indent) + "</" + name + ">"
+    if (subtags.isEmpty) "<" + tag.name + attrs + "/>" else {
+      "<" + tag.name + attrs + ">\n" + subtags.reverseMap(_.toStringWithIndent(indent + 1)).mkString("\n") + "\n" + Constants.indent(indent) + "</" + tag.name + ">"
     }
   }
 

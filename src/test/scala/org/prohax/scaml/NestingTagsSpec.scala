@@ -12,34 +12,35 @@ class NestingTagsSpec extends Specification {
   "The nestTags method" should {
     "work for dead simple cases" in {
       ScamlParseResult.nestTags(Nil) must beEmpty
-      ScamlParseResult.nestTags(List(a)) must beEqualTo(List(NestedTag("html", Nil)))
+      ScamlParseResult.nestTags(List(a)) must beEqualTo(List(NestedTag(a, Nil)))
     }
     "nest simply" in {
       ScamlParseResult.nestTags(List(a, b)) must beEqualTo(List(
-        NestedTag("html", List(
-          NestedTag("head", Nil)))))
+        NestedTag(a, List(
+          NestedTag(b, Nil)))))
       ScamlParseResult.nestTags(List(a, b, c)) must beEqualTo(List(
-        NestedTag("html", List(
-          NestedTag("head", List(
-            NestedTag("title", Nil)))))))
+        NestedTag(a, List(
+          NestedTag(b, List(
+            NestedTag(c, Nil)))))))
     }
     "handle multiple at sub levels" in {
       ScamlParseResult.nestTags(List(a, b, d)) must beEqualTo(List(
-        NestedTag("html", List(
-          NestedTag("body", Nil),
-          NestedTag("head", Nil)))))
+        NestedTag(a, List(
+          NestedTag(d, Nil),
+          NestedTag(b, Nil)))))
       ScamlParseResult.nestTags(List(a, b, c, d, e)) must beEqualTo(List(
-        NestedTag("html", List(
-          NestedTag("body", List(
-            NestedTag("h1", Nil))),
-          NestedTag("head", List(
-            NestedTag("title", Nil)))))))
+        NestedTag(a, List(
+          NestedTag(d, List(
+            NestedTag(e, Nil))),
+          NestedTag(b, List(
+            NestedTag(c, Nil)))))))
     }
     "handle multiples at base level" in {
-      ScamlParseResult.nestTags(List(a, b, ScamlTag(0, "lol"))) must beEqualTo(
-        List(NestedTag("lol", Nil),
-        NestedTag("html", List(
-          NestedTag("head", Nil)))))
+      val lol = ScamlTag(0, "lol")
+      ScamlParseResult.nestTags(List(a, b, lol)) must beEqualTo(
+        List(NestedTag(lol, Nil),
+        NestedTag(a, List(
+          NestedTag(b, Nil)))))
     }
   }
 }
