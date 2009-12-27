@@ -14,8 +14,9 @@ class Parser extends RegexParsers {
 
   def emptyLine: Parser[Option[ScamlTag]] = """^\s*$""".r ^^ (_ => None)
 
-  def tagLine: Parser[Option[ScamlTag]] = rep(indent) ~ opt(tag) ~ rep(cls) ~ opt(id) ~ rep(cls) ^^
-          {case indents ~ tag ~ cls1 ~ id ~ cls2 => Some(new ScamlTag(indents.length, tag, id, cls1 ::: cls2))}
+  def tagLine: Parser[Option[ScamlTag]] = rep(indent) ~ opt(tag) ~ rep(cls) ~ opt(id) ~ rep(cls) ~ opt(text) ^^
+          {case indents ~ tag ~ cls1 ~ id ~ cls2 ~ text =>
+            Some(new ScamlTag(indents.length, tag, id, cls1 ::: cls2, text))}
 
   def indent: Parser[String] = "  ".r
 
@@ -26,6 +27,8 @@ class Parser extends RegexParsers {
   def id: Parser[String] = """#""".r ~> word
 
   def cls: Parser[String] = """\.""".r ~> word
+
+  def text: Parser[String] = " " ~> ".*".r
 }
 
 object Parser {

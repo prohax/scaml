@@ -18,7 +18,7 @@ class ParsingUnitSpec extends Specification {
     def parse(input: String) = parser.parseAll(parser.tagLine, input)
 
     "match empty lines but that's ok" in {
-      parse("").get.get must beEqualTo(ScamlTag(0, None, None, Nil))
+      parse("").get.get must beEqualTo(ScamlTag(0, None, None, Nil, None))
     }
     
     "match simple cases" in {
@@ -49,9 +49,14 @@ class ParsingUnitSpec extends Specification {
     }
 
     "match divs implicitly" in {
-      parse(".header").get.get must beEqualTo(ScamlTag(0, None, None, List("header")))
-      parse("  #main").get.get must beEqualTo(ScamlTag(1, None, Some("main"), Nil))
-      parse("    .main.ima#lol.too").get.get must beEqualTo(ScamlTag(2, None, Some("lol"), List("main", "ima", "too")))
+      parse(".header").get.get must beEqualTo(ScamlTag(0, None, None, List("header"), None))
+      parse("  #main").get.get must beEqualTo(ScamlTag(1, None, Some("main"), Nil, None))
+      parse("    .main.ima#lol.too").get.get must beEqualTo(ScamlTag(2, None, Some("lol"), List("main", "ima", "too"), None))
+    }
+
+    "match inline text" in {
+      parse("%p.header Header here guys").get.get must beEqualTo(ScamlTag(0, Some("p"), None, List("header"), Some("Header here guys")))
+      parse("  %body#main Sup in my body").get.get must beEqualTo(ScamlTag(1, Some("body"), Some("main"), Nil, Some("Sup in my body")))
     }
   }
 }
