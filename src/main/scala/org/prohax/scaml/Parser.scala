@@ -27,7 +27,7 @@ class Parser extends RegexParsers {
 
   def cls: Parser[String] = """\.""".r ~> word
 
-  def text: Parser[String] = " " ~> ".*".r
+  def text: Parser[String] = opt(" *".r) ~> """\w.*""".r
 }
 
 object Parser {
