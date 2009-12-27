@@ -1,9 +1,10 @@
 package org.prohax.scaml
 
-case class ScamlTag(level: Int, name: String, id: Option[String])
+case class ScamlTag(level: Int, name: String, id: Option[String], classes: List[String])
 object ScamlTag {
-  def apply(level: Int, name: String) = new ScamlTag(level, name, None)
-  def apply(level: Int, name: String, id: String) = new ScamlTag(level, name, Some(id))
+  def apply(level: Int, name: String) = new ScamlTag(level, name, None, Nil)
+  def apply(level: Int, name: String, id: String) = new ScamlTag(level, name, Some(id), Nil)
+  def apply(level: Int, name: String, id: Option[String]) = new ScamlTag(level, name, id, Nil)
 }
 
 case class ScamlParseResult(headers: List[String], tags: List[ScamlTag]) {

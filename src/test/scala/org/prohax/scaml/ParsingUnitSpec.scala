@@ -17,6 +17,14 @@ class ParsingUnitSpec extends Specification {
 
     "match ids" in {
       parse("%p#header").get must beEqualTo(ScamlTag(0, "p", "header"))
+      parse("  %p#header#lol").successful must beFalse
+      parse("  %html#isok").get must beEqualTo(ScamlTag(1, "html", "isok"))
+    }
+
+    "match classes" in {
+      parse("%p.header").get must beEqualTo(ScamlTag(0, "p", None, List("header")))
+      parse("  %body.main").get must beEqualTo(ScamlTag(1, "body", None, List("main")))
+      parse("  %body.main.ima.lol.too").get must beEqualTo(ScamlTag(1, "body", None, List("main", "ima", "lol", "too")))
     }
   }
 }

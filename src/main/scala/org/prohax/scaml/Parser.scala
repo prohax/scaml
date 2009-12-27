@@ -7,12 +7,13 @@ class Parser extends RegexParsers {
   def start: Parser[ScamlParseResult] = opt(header) ~ rep(tagLine) ^^ (x =>
     ScamlParseResult(x._1.map(List(_)).getOrElse(Nil), x._2))
   def header: Parser[String] = "!!!".r ^^ (_ => Constants.escape(Constants.DOCTYPE))
-  def tagLine: Parser[ScamlTag] = rep(indent) ~ tag ~ opt(id) ^^
-          { case indents ~ tag ~ id => ScamlTag(indents.length,tag,id) }
+  def tagLine: Parser[ScamlTag] = rep(indent) ~ tag ~ opt(id) ~ rep(cls) ^^
+          { case indents ~ tag ~ id ~ classes => ScamlTag(indents.length,tag,id,classes) }
   def indent: Parser[String] = "  ".r
-  def tag: Parser[String] = "%".r ~> tagName
-  def tagName: Parser[String] = """\w+""".r
-  def id: Parser[String] = "#".r ~> tagName
+  def tag: Parser[String] = "%".r ~> word
+  def word: Parser[String] = """\w+""".r
+  def id: Parser[String] = """#""".r ~> word
+  def cls: Parser[String] = """\.""".r ~> word
 }
 
 object Parser {
@@ -20,7 +21,6 @@ object Parser {
 
   def parse(name: String, input: String) = {
     val parsed = parser.parseAll(parser.start, input)
-    println("parsed = " + parsed)
     Constants.surround(name, if (parsed.successful) parsed.get.render else Constants.indent(2) + Constants.escape(parsed.toString))
   }
 }
