@@ -6,7 +6,7 @@ import org.prohax.scaml.ScamlFile
 import org.prohax.scaml.models._
 
 object params extends ScamlFile[(List[Post])] {
-  def renderXml(t: (List[Post])) = t match { case (posts) =>
+  def renderXml(t:(List[Post])) = t match { case (posts) =>
     <div id='posts'>
       <h1>
         Got

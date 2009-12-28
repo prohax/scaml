@@ -7,16 +7,15 @@ case class ScamlParseResult(params: List[(String, String)], headers: List[String
 
 import scala.xml._
 import org.prohax.scaml.ScamlFile
-""" + (if (imports.isEmpty) "" else "\n" + imports.map("import " + _ + "\n")) + """
-object """ + name + """ extends ScamlFile {""" + renderHeaders + """
-  def renderXml""" + methodParams(params) + """
-""" + renderBody + """
+""" + (if (imports.isEmpty) "" else "\n" + imports.map("import " + _ + "\n").mkString) + """
+object """ + name + " extends ScamlFile[" + (if (params.isEmpty) "Unit" else "(" + params.map(_._2).mkString(",") + ")") + "] {" + renderHeaders + """
+  def renderXml""" + methodParams(params) + "\n" + renderBody + """
   }
 }"""
 
   def methodParams(params: List[(String, String)]) = params match {
     case Nil => "(t:Unit) = {"
-    case _ => "(t:(" + params.map(_._2) + ") = t match { case (" + params.map(_._1) + ") =>"
+    case _ => "(t:(" + params.map(_._2).mkString(",") + ")) = t match { case (" + params.map(_._1).mkString(",") + ") =>"
   }
 
   private def renderBody = if (tags.isEmpty) {

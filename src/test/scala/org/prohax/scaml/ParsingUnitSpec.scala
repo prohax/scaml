@@ -71,9 +71,9 @@ class ParsingUnitSpec extends Specification {
   "The params parser" should {
     def parse(input: String) = parser.parseAll(parser.params, input)
     "work" in {
-      val expected = List(("a", "String"), ("b", "Post"))
-      parse("\n/! a: String, b: Post").get must beEqualTo(expected)
-      parse("\n/!    a     :        String      ,      b     :     Post     ").get must beEqualTo(expected)
+      val expected = List(("a", "String"), ("b", "List[String]"))
+      parse("\n/! a: String, b: List[String]").get must beEqualTo(expected)
+      parse("\n/!    a     :        String      ,      b     :     List[String]     ").get must beEqualTo(expected)
     }
   }
 

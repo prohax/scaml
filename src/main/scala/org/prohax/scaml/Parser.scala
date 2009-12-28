@@ -15,7 +15,7 @@ class Parser extends RegexParsers {
     case Some(x) => x
   }
 
-  def param: Parser[(String, String)] = " *".r ~> """\w+""".r ~ " *: *".r ~ """\w+""".r <~ " *".r ^^ {
+  def param: Parser[(String, String)] = " *".r ~> """\w+""".r ~ " *: *".r ~ """[\w\[\]\(\)]+""".r <~ " *".r ^^ {
     case valName ~ sep ~ typeName => (valName, typeName)
   } 
 
