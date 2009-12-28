@@ -21,6 +21,14 @@ object literals extends ScamlFile {
         { 6 * 30.5 }
         cm tall.
       </p>
+      <p>
+        Counting to three:
+        <ul>
+          { (1 to 3).map(i =>
+            <li>{ i }</li>
+          ) }
+        </ul>
+      </p>
     </div>
   }
 }
