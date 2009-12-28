@@ -11,6 +11,11 @@ object literals extends ScamlFile {
         Welcome, Mr
         <span class='bold'>Boldfase</span>
       </p>
+      <p>
+        You are
+        <span class='red'>{ 4 * 5 }</span>
+        years old.
+      </p>
     </div>
   }
 }

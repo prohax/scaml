@@ -30,7 +30,7 @@ class Parser extends RegexParsers {
 
   def other: Parser[String] = code | text
 
-  def code: Parser[String] = "= ".r ~> ".*".r ^^ (code => "{ " + code + " }")
+  def code: Parser[String] = opt(" *".r) ~> "= ".r ~> ".*".r ^^ (code => "{ " + code + " }")
 
   def text: Parser[String] = opt(" *".r) ~> """[^\s#\.].*""".r
 }
