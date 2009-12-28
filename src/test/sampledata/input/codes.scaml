@@ -3,4 +3,8 @@
   %ul
     = (1 to 3).map(i =>
       %li= i
-      
+%p
+  First 9 squares:
+  %ul
+    = (1 to 9).map { i =>
+      %li= i*i

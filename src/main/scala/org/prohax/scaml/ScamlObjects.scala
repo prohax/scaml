@@ -28,10 +28,11 @@ case class NestedTag(tag: ScamlTag, subtags: List[NestedTag]) {
         if (tag.isText) {
           tag.text.get.s
         } else if (tag.isCode) {
-          "{ " + tag.text.map(_.s).getOrElse("") + {
+          val code = tag.text.get.s
+          "{ " + code + {
             if (subtags.isEmpty) "" else
-              "\n" + subtags.reverseMap(_.toStringWithIndent(indent + 1)).mkString("\n") + "\n" + Constants.indent(indent) + ")"
-          } + " }"
+              "\n" + subtags.reverseMap(_.toStringWithIndent(indent + 1)).mkString("\n") + "\n" + Constants.indent(indent)
+          } + Constants.closingBrackets(code) + " }"
         } else {
           val name = tag.name.getOrElse("div")
           val within = tag.text.map(_.toInlineString).getOrElse({

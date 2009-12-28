@@ -13,5 +13,13 @@ object codes extends ScamlFile {
         ) }
       </ul>
     </p>
+    <p>
+      First 9 squares:
+      <ul>
+        { (1 to 9).map { i =>
+          <li>{ i*i }</li>
+        } }
+      </ul>
+    </p>
   }
 }
