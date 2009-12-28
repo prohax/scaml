@@ -26,7 +26,12 @@ case class NestedTag(tag: ScamlTag, subtags: List[NestedTag]) {
     } else {
       Constants.indent(indent) + {
         if (tag.isText) {
-          tag.text.get
+          tag.text.get.s
+        } else if (tag.isCode) {
+          "{ " + tag.text.map(_.s).getOrElse("") + {
+            if (subtags.isEmpty) "" else
+              "\n" + subtags.reverseMap(_.toStringWithIndent(indent + 1)).mkString("\n") + "\n" + Constants.indent(indent) + ")"
+          } + " }"
         } else {
           val name = tag.name.getOrElse("div")
           val within = tag.text.map(_.toInlineString).getOrElse({
@@ -47,12 +52,12 @@ case class NestedTag(tag: ScamlTag, subtags: List[NestedTag]) {
   })
 }
 
-sealed trait NonTag {
+sealed abstract case class NonTag(s: String) {
   def toInlineString: String
 }
-case class Text(s: String) extends NonTag {
+case class Text(text: String) extends NonTag(text) {
   def toInlineString = s
 }
-case class Code(s: String) extends NonTag {
+case class Code(code: String) extends NonTag(code) {
   def toInlineString = "{ " + s + " }"  
 }
