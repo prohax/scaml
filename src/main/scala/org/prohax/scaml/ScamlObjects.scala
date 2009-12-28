@@ -1,9 +1,11 @@
 package org.prohax.scaml
 
-case class ScamlTag(level: Int, name: Option[String], id: Option[String], classes: List[String], text: Option[String]) {
+case class ScamlTag(level: Int, name: Option[String], id: Option[String], classes: List[String], text: Option[NonTag]) {
   def isEmpty = !isTag && text.isEmpty
 
-  def isText = !isTag && !text.isEmpty
+  def isText = !isTag && !text.isEmpty && text.get.isInstanceOf[Text]
+
+  def isCode = !isTag && !text.isEmpty && text.get.isInstanceOf[Code]
 
   def isTag = !(name.isEmpty && id.isEmpty && classes.isEmpty)
 }
@@ -27,7 +29,7 @@ case class NestedTag(tag: ScamlTag, subtags: List[NestedTag]) {
           tag.text.get
         } else {
           val name = tag.name.getOrElse("div")
-          val within = tag.text.getOrElse({
+          val within = tag.text.map(_.toInlineString).getOrElse({
             if (subtags.isEmpty) "" else
               "\n" + subtags.reverseMap(_.toStringWithIndent(indent + 1)).mkString("\n") + "\n" + Constants.indent(indent)
           })
@@ -43,4 +45,14 @@ case class NestedTag(tag: ScamlTag, subtags: List[NestedTag]) {
     case Nil => ""
     case classes => " class='" + classes.mkString(" ") + "'"
   })
+}
+
+sealed trait NonTag {
+  def toInlineString: String
+}
+case class Text(s: String) extends NonTag {
+  def toInlineString = s
+}
+case class Code(s: String) extends NonTag {
+  def toInlineString = "{ " + s + " }"  
 }

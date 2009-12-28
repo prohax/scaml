@@ -46,25 +46,25 @@ class ParsingUnitSpec extends Specification {
     }
 
     "match inline text" in {
-      parse("%p.header Header here guys").get must beEqualTo(ScamlTag(0, Some("p"), None, List("header"), Some("Header here guys")))
-      parse("  %body#main Sup in my body").get must beEqualTo(ScamlTag(1, Some("body"), Some("main"), Nil, Some("Sup in my body")))
+      parse("%p.header Header here guys").get must beEqualTo(ScamlTag(0, Some("p"), None, List("header"), Some(Text("Header here guys"))))
+      parse("  %body#main Sup in my body").get must beEqualTo(ScamlTag(1, Some("body"), Some("main"), Nil, Some(Text("Sup in my body"))))
     }
 
     "match block text" in {
-      parse("    some text here").get must beEqualTo(ScamlTag(2, None, None, Nil, Some("some text here")))
+      parse("    some text here").get must beEqualTo(ScamlTag(2, None, None, Nil, Some(Text("some text here"))))
     }
   }
 
   "The 'other' parser" should {
-    def parse(input: String) = parser.parseAll(parser.other, input)
+    def parse(input: String) = parser.parseAll(parser.nontag, input)
     "treat code differently" in {
-      parse("something").get must beEqualTo("something")
-      parse("          something").get must beEqualTo("something")
-      parse("= 5 * 4").get must beEqualTo("{ 5 * 4 }")
+      parse("something").get must beEqualTo(Text("something"))
+      parse("          something").get must beEqualTo(Text("something"))
+      parse("= 5 * 4").get must beEqualTo(Code("5 * 4"))
     }
     "only parse code if the equals is first" in {
-      parse(" = 5 * 4").get must beEqualTo("= 5 * 4")
-      parse("      = 10 * 10").get must beEqualTo("= 10 * 10")
+      parse(" = 5 * 4").get must beEqualTo(Text("= 5 * 4"))
+      parse("      = 10 * 10").get must beEqualTo(Text("= 10 * 10"))
     }
   }
 
@@ -90,8 +90,8 @@ class ParsingUnitSpec extends Specification {
   %p.byline Lolfase.""")
       parsed.get must beEqualTo(ScamlParseResult(Nil, List(
         ScamlTag(0, Some("div"), None, Nil, None),
-        ScamlTag(1, Some("h1"), None, Nil, Some("Hello there.")),
-        ScamlTag(1, Some("p"), None, List("byline"), Some("Lolfase."))
+        ScamlTag(1, Some("h1"), None, Nil, Some(Text("Hello there."))),
+        ScamlTag(1, Some("p"), None, List("byline"), Some(Text("Lolfase.")))
         )))
     }
 
@@ -102,8 +102,8 @@ class ParsingUnitSpec extends Specification {
     Lolfase.""")
       parsed.get must beEqualTo(ScamlParseResult(Nil, List(
         ScamlTag(0, Some("div"), None, Nil, None),
-        ScamlTag(1, Some("h1"), None, Nil, Some("Hello there.")),
-        ScamlTag(2, None, None, Nil, Some("Lolfase."))
+        ScamlTag(1, Some("h1"), None, Nil, Some(Text("Hello there."))),
+        ScamlTag(2, None, None, Nil, Some(Text("Lolfase.")))
         )))
     }
   }
