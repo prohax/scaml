@@ -21,5 +21,18 @@ object codes extends ScamlFile {
         } }
       </ul>
     </p>
+    <p>
+      Nesting times:
+      <table>
+        { List((1,2), (3,4), (5,6)).map { x =>
+          <tr>
+            <td>{ x._1 }</td>
+            { (1 to x._2).map { i =>
+              <td>{ i  }</td>
+            } }
+          </tr>
+        } }
+      </table>
+    </p>
   }
 }
