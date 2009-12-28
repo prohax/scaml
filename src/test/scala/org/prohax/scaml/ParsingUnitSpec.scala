@@ -68,6 +68,15 @@ class ParsingUnitSpec extends Specification {
     }
   }
 
+  "The params parser" should {
+    def parse(input: String) = parser.parseAll(parser.params, input)
+    "work" in {
+      val expected = List(("a", "String"), ("b", "Post"))
+      parse("\n/! a: String, b: Post").get must beEqualTo(expected)
+      parse("\n/!    a     :        String      ,      b     :     Post     ").get must beEqualTo(expected)
+    }
+  }
+
   "A multiline parser" should {
     def parse(input: String) = parser.parseAll(parser.start, input)
 
@@ -76,7 +85,7 @@ class ParsingUnitSpec extends Specification {
 %html
   %head
     %title""")
-      parsed.get must beEqualTo(ScamlParseResult(Nil, List(
+      parsed.get must beEqualTo(ScamlParseResult(Nil, Nil, List(
         ScamlTag(0, "html"),
         ScamlTag(1, "head"),
         ScamlTag(2, "title")
@@ -88,7 +97,7 @@ class ParsingUnitSpec extends Specification {
 %div
   %h1 Hello there.
   %p.byline Lolfase.""")
-      parsed.get must beEqualTo(ScamlParseResult(Nil, List(
+      parsed.get must beEqualTo(ScamlParseResult(Nil, Nil, List(
         ScamlTag(0, Some("div"), None, Nil, None),
         ScamlTag(1, Some("h1"), None, Nil, Some(Text("Hello there."))),
         ScamlTag(1, Some("p"), None, List("byline"), Some(Text("Lolfase.")))
@@ -100,7 +109,7 @@ class ParsingUnitSpec extends Specification {
 %div
   %h1 Hello there.
     Lolfase.""")
-      parsed.get must beEqualTo(ScamlParseResult(Nil, List(
+      parsed.get must beEqualTo(ScamlParseResult(Nil, Nil, List(
         ScamlTag(0, Some("div"), None, Nil, None),
         ScamlTag(1, Some("h1"), None, Nil, Some(Text("Hello there."))),
         ScamlTag(2, None, None, Nil, Some(Text("Lolfase.")))

@@ -1,0 +1,13 @@
+/! posts: List[Post]
+#posts
+  %h1
+    Got
+    = posts.length
+    posts for ya.
+  .spacer
+    %ul
+      = posts.map(p =>
+        %li
+          %span.author= p.author
+          %span.posts= p.body.take(1)
+          %span.date= p.date

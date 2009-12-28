@@ -2,15 +2,15 @@ package org.prohax.scaml
 
 import scala.xml.{TopScope, Xhtml, NodeSeq}
 
-trait ScamlFile {
+trait ScamlFile[T] {
   def headers = ""
 
-  def renderXml(): NodeSeq
+  def renderXml(t: T): NodeSeq
 
-  def renderString() = {
+  def renderString(t: T) = {
     val sb = new StringBuilder()
     if (!headers.isEmpty) sb append headers + "\n"
-    Xhtml.sequenceToXML(renderXml, TopScope, sb, false, false)
+    Xhtml.sequenceToXML(renderXml(t), TopScope, sb, false, false)
     sb.toString().replaceAll("\\n    ", "\n")
   }
 }

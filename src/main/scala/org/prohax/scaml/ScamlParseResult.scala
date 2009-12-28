@@ -1,18 +1,23 @@
 package org.prohax.scaml
 
-case class ScamlParseResult(headers: List[String], tagsIncludingEmpty: List[ScamlTag]) {
+case class ScamlParseResult(params: List[(String, String)], headers: List[String], tagsIncludingEmpty: List[ScamlTag]) {
   private val tags = tagsIncludingEmpty.filter(!_.isEmpty)
   import ScamlParseResult._
-  def render(name: String) = """package org.prohax.scaml.output
+  def render(name: String, imports: List[String]) = """package org.prohax.scaml.output
 
 import scala.xml._
 import org.prohax.scaml.ScamlFile
-
+""" + (if (imports.isEmpty) "" else "\n" + imports.map("import " + _ + "\n")) + """
 object """ + name + """ extends ScamlFile {""" + renderHeaders + """
-  def renderXml() = {
+  def renderXml""" + methodParams(params) + """
 """ + renderBody + """
   }
 }"""
+
+  def methodParams(params: List[(String, String)]) = params match {
+    case Nil => "(t:Unit) = {"
+    case _ => "(t:(" + params.map(_._2) + ") = t match { case (" + params.map(_._1) + ") =>"
+  }
 
   private def renderBody = if (tags.isEmpty) {
     Constants.indent(2) + Constants.EMPTY

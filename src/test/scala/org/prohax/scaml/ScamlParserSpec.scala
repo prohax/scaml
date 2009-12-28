@@ -16,7 +16,7 @@ object ScamlParserSpec extends Specification {
     new File(inputDir).listFiles.foreach((f: File) => {
       "read, parse and output for " + f.getName in {
         val name = f.getName.replaceFirst("\\.scaml$", "")
-        Parser.parse(name, Source.fromFile(f).getLines.mkString) must beEqualTo(
+        Parser.parse(name, List("org.prohax.scaml.models._"), Source.fromFile(f).getLines.mkString) must beEqualTo(
           read("src/main/scala/org/prohax/scaml/output/" + name + ".scala"))
       }
     })
@@ -25,15 +25,15 @@ object ScamlParserSpec extends Specification {
   "The renderer" should {
     import output._
     List(
-      ("classesandids", () => classesandids.renderString),
-      ("complexnesting", () => complexnesting.renderString),
-      ("doctype", () => doctype.renderString),
-      ("doublynested", () => doublynested.renderString),
-      ("emptyfile", () => emptyfile.renderString),
-      ("html", () => html.renderString),
-      ("literals", () => literals.renderString),
-      ("codes", () => codes.renderString),
-      ("tag_parsing", () => tag_parsing.renderString)
+      ("classesandids", () => classesandids.renderString(())),
+      ("complexnesting", () => complexnesting.renderString(())),
+      ("doctype", () => doctype.renderString(())),
+      ("doublynested", () => doublynested.renderString(())),
+      ("emptyfile", () => emptyfile.renderString(())),
+      ("html", () => html.renderString(())),
+      ("literals", () => literals.renderString(())),
+      ("codes", () => codes.renderString(())),
+      ("tag_parsing", () => tag_parsing.renderString(()))
     ).foreach(x => {
       "work for " + x._1 in {
         x._2() must beEqualTo(read(outputDir + x._1 + ".html"))
