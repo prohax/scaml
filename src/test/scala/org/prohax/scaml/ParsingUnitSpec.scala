@@ -55,6 +55,14 @@ class ParsingUnitSpec extends Specification {
     }
   }
 
+  "The 'other' parser" should {
+    def parse(input: String) = parser.parseAll(parser.other, input)
+    "treat code differently" in {
+      parse("something").get must beEqualTo("something")
+      parse("= 5 * 4").get must beEqualTo("{ 5 * 4 }")
+    }
+  }
+
   "A multiline parser" should {
     def parse(input: String) = parser.parseAll(parser.start, input)
 

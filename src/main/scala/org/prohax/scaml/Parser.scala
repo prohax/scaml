@@ -6,14 +6,15 @@ class Parser extends RegexParsers {
   override val whiteSpace = "".r
   val newline = """[\n\r]+""".r
 
-  def start: Parser[ScamlParseResult] = opt(header) ~ rep(line) ^^ (x =>
-    ScamlParseResult(x._1.map(List(_)).getOrElse(Nil), x._2))
+  def start: Parser[ScamlParseResult] = opt(header) ~ rep(line) ^^ {
+    case header ~ lines => ScamlParseResult(header.map(List(_)).getOrElse(Nil), lines)
+  }
 
   def header: Parser[String] = newline ~> "!!!".r ^^ (_ => Constants.DOCTYPE)
 
   def line: Parser[ScamlTag] = newline ~> tagLine
 
-  def tagLine: Parser[ScamlTag] = rep(indent) ~ opt(tag) ~ rep(cls) ~ opt(id) ~ rep(cls) ~ opt(text) ^^
+  def tagLine: Parser[ScamlTag] = rep(indent) ~ opt(tag) ~ rep(cls) ~ opt(id) ~ rep(cls) ~ opt(other) ^^
           {case indents ~ tag ~ cls1 ~ id ~ cls2 ~ text =>
             new ScamlTag(indents.length, tag, id, cls1 ::: cls2, text)}
 
@@ -27,7 +28,11 @@ class Parser extends RegexParsers {
 
   def cls: Parser[String] = """\.""".r ~> word
 
-  def text: Parser[String] = opt(" *".r) ~> """\w.*""".r
+  def other: Parser[String] = code | text
+
+  def code: Parser[String] = "= ".r ~> ".*".r ^^ (code => "{ " + code + " }")
+
+  def text: Parser[String] = opt(" *".r) ~> """[^\s#\.].*""".r
 }
 
 object Parser {
