@@ -10,4 +10,4 @@
         %li
           %span.author= p.author
           %span.posts= p.body.take(1)
-          %span.date= p.date
+          %span.date= "%tD" format p.date

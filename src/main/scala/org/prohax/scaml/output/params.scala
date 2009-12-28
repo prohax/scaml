@@ -19,7 +19,7 @@ object params extends ScamlFile[(List[Post])] {
             <li>
               <span class='author'>{ p.author }</span>
               <span class='posts'>{ p.body.take(1) }</span>
-              <span class='date'>{ p.date }</span>
+              <span class='date'>{ "%tD" format p.date }</span>
             </li>
           ) }
         </ul>
