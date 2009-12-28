@@ -59,7 +59,12 @@ class ParsingUnitSpec extends Specification {
     def parse(input: String) = parser.parseAll(parser.other, input)
     "treat code differently" in {
       parse("something").get must beEqualTo("something")
+      parse("          something").get must beEqualTo("something")
       parse("= 5 * 4").get must beEqualTo("{ 5 * 4 }")
+    }
+    "only parse code if the equals is first" in {
+      parse(" = 5 * 4").get must beEqualTo("= 5 * 4")
+      parse("      = 10 * 10").get must beEqualTo("= 10 * 10")
     }
   }
 
