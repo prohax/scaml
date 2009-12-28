@@ -32,6 +32,7 @@ object ScamlParserSpec extends Specification {
       ("emptyfile", () => emptyfile.renderString),
       ("html", () => html.renderString),
       ("literals", () => literals.renderString),
+      ("codes", () => codes.renderString),
       ("tag_parsing", () => tag_parsing.renderString)
     ).foreach(x => {
       "work for " + x._1 in {
