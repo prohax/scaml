@@ -6,19 +6,11 @@ scaml is a Scala version/dialect/rip-off/etc of HAML. It is an attempt to bring 
 
 Take this simple SCAML file:
 
-	!!!
-	%html
-	  %head
-	    %title
-	  %body
-	    %div#first
-	      %h1.megaBig
-	      %div#name.super.win
-	        %p.thin
-	          %strong
-	        %p.wide
-	        %br
-	    %div#last
+	%div
+	  %h1 Test.
+	  %p
+	    Welcome, Mr
+	    %span.bold Boldfase
 
 This is rendered to the following Scala source file:
 
@@ -27,74 +19,39 @@ This is rendered to the following Scala source file:
 	import scala.xml._
 	import org.prohax.scaml.ScamlFile
 
-	object classesandids extends ScamlFile {
-	  override def headers = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">"""
+	import org.prohax.scaml.models._
 
-	  def renderXml() = {
-	    <html>
-	      <head>
-	        <title/>
-	      </head>
-	      <body>
-	        <div id='first'>
-	          <h1 class='megaBig'/>
-	          <div id='name' class='super win'>
-	            <p class='thin'>
-	              <strong/>
-	            </p>
-	            <p class='wide'/>
-	            <br/>
-	          </div>
-	        </div>
-	        <div id='last'/>
-	      </body>
-	    </html>
+	object literals extends ScamlFile[Unit] {
+	  def renderXml(t:Unit) = {
+	    <div>
+	      <h1>Test.</h1>
+	      <p>
+	        Welcome, Mr
+	        <span class='bold'>Boldfase</span>
+	      </p>
+	    </div>
 	  }
 	}
 
 Then, when rendered, produces the following HTML:
 
-	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-	<html>
-	  <head>
-	    <title />
-	  </head>
-	  <body>
-	    <div id="first">
-	      <h1 class="megaBig" />
-	      <div class="super win" id="name">
-	        <p class="thin">
-	          <strong />
-	        </p>
-	        <p class="wide" />
-	        <br />
-	      </div>
-	    </div>
-	    <div id="last"></div>
-	  </body>
-	</html>
+	<div>
+	  <h1>Test.</h1>
+	  <p>
+	    Welcome, Mr
+	    <span class="bold">Boldfase</span>
+	  </p>
+	</div>
 
-Note that the above SCAML is valid HAML, and running it through the HAML compiler gives:
+Note that the above SCAML is valid HAML, and running it through the HAML compiler gives something virtually the same:
 
-	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-	<html>
-	  <head>
-	    <title></title>
-	  </head>
-	  <body>
-	    <div id='first'>
-	      <h1 class='megaBig'></h1>
-	      <div class='super win' id='name'>
-	        <p class='thin'>
-	          <strong></strong>
-	        </p>
-	        <p class='wide'></p>
-	        <br />
-	      </div>
-	    </div>
-	    <div id='last'></div>
-	  </body>
-	</html>
+	<div>
+	  <h1>Test.</h1>
+	  <p>
+	    Welcome, Mr
+	    <span class='bold'>Boldfase</span>
+	  </p>
+	</div>
 
 ## embedded Scala
 
@@ -121,7 +78,7 @@ SCAML allows embedding of code very similarly to HAML:
 
 This produces nice, clean Scala code.
 
-	def renderXml() = {
+	def renderXml(t:Unit) = {
 	  <p>
 	    Counting to three:
 	    <ul>
@@ -181,13 +138,92 @@ And the following, slightly less clean HTML.
 	  </table>
 	</p>
 
+## passing variables
+
+Usually, templates are passed (perhaps implicitly) model objects to render. Assuming we have a simple model and some instances:
+
+	case class Post(author: String, body: List[String], date: Date)
+	
+	List(
+	  Post("Glen", List("This is line 1", "and line 2", "and line 3"), new Date(2009, 12, 28)),
+	  Post("Ben", List("Lol I am too sick for cider"), new Date(2009, 11, 28)),
+	  Post("Dylan", List("I", "like", "cider."), new Date(2009, 10, 28))
+	)
+
+You write this SCAML:
+
+	/! posts: List[Post]
+	#posts
+	  %h1
+	    Got
+	    = posts.length
+	    posts for ya.
+	  .spacer
+	    %ul
+	      = posts.map(p =>
+	        %li
+	          %span.author= p.author
+	          %span.posts= p.body.take(1)
+	          %span.date= "%tD" format p.date
+
+Which renders this Scala source:
+
+	object params extends ScamlFile[(List[Post])] {
+	  def renderXml(t:(List[Post])) = t match { case (posts) =>
+	    <div id='posts'>
+	      <h1>
+	        Got
+	        { posts.length }
+	        posts for ya.
+	      </h1>
+	      <div class='spacer'>
+	        <ul>
+	          { posts.map(p =>
+	            <li>
+	              <span class='author'>{ p.author }</span>
+	              <span class='posts'>{ p.body.take(1) }</span>
+	              <span class='date'>{ "%tD" format p.date }</span>
+	            </li>
+	          ) }
+	        </ul>
+	      </div>
+	    </div>
+	  }
+
+And this html:
+
+	<div id="posts">
+	  <h1>
+	    Got
+	    3
+	    posts for ya.
+	  </h1>
+	  <div class="spacer">
+	    <ul>
+	      <li>
+	          <span class="author">Glen</span>
+	          <span class="posts">This is line 1</span>
+	          <span class="date">01/28/10</span>
+	        </li><li>
+	          <span class="author">Ben</span>
+	          <span class="posts">Lol I am too sick for cider</span>
+	          <span class="date">12/28/09</span>
+	        </li><li>
+	          <span class="author">Dylan</span>
+	          <span class="posts">I</span>
+	          <span class="date">11/28/09</span>
+	        </li>
+	    </ul>
+	  </div>
+	</div>
+
 ## so what?
 
 Well, the idea is to flesh this out until it supports as much of the HAML spec as possible, and provides a legitimate option for JVM web apps. I'd like to integrate it with [Play](http://www.playframework.org/), which I see as the most promising web framework in the world right now, for the JVM or otherwise.
 
 ## next steps
 
-Passing variables into these templates is more difficult than in HAML, since the Scala source must be compiled. I'm planning on adopting something similar to [SXT](http://github.com/nkpart/sxt).
+Passing variables into these templates is more difficult than in HAML, since the Scala source must be compiled. I've adopted something similar to [SXT](http://github.com/nkpart/sxt), but more constrained. It will take integration with a framework for this to be really locked down.
 
 Figuring a nice way to work with the Scala branch of Play would be nice too.
 
