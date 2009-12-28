@@ -13,8 +13,13 @@ object literals extends ScamlFile {
       </p>
       <p>
         You are
-        <span class='red'>{ 4 * 5 }</span>
+        <span class='red'>{ 20 + 5 }</span>
         years old.
+      </p>
+      <p>
+        And
+        { 6 * 30.5 }
+        cm tall.
       </p>
     </div>
   }
