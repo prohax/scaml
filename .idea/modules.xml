@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/saml.iml" filepath="$PROJECT_DIR$/saml.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scaml.iml" filepath="$PROJECT_DIR$/scaml.iml" />
     </modules>
   </component>
 </project>

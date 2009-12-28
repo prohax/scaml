@@ -28,7 +28,7 @@ object codes extends ScamlFile {
           <tr>
             <td>{ x._1 }</td>
             { (1 to x._2).map { i =>
-              <td>{ i  }</td>
+              <td>{ i }</td>
             } }
           </tr>
         } }
