@@ -1,5 +1,6 @@
-/! posts: List[Post]
+/! posts: List[(String, List[String], Date)], title: String
 #posts
+  %h1= title
   %h1
     Got
     = posts.length
@@ -8,6 +9,6 @@
     %ul
       = posts.map(p =>
         %li
-          %span.author= p.author
-          %span.posts= p.body.take(1)
-          %span.date= "%tD" format p.date
+          %span.author= p._1
+          %span.posts= p._2.take(1)
+          %span.date= "%tD" format p._3

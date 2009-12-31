@@ -1,12 +1,4 @@
-package org.prohax.scaml.output
-
-import scala.xml._
-import org.prohax.scaml.ScamlFile
-
-import org.prohax.scaml.models._
-
-object tag_parsing extends ScamlFile[Unit] {
-  def renderXml(t:Unit) = {
+def tag_parsing = {
     <div class='tags'>
       <foo>1</foo>
       <FOO>2</FOO>
@@ -30,5 +22,4 @@ object tag_parsing extends ScamlFile[Unit] {
       <div class='123'>f</div>
       <div class='foo2u'>g</div>
     </div>
-  }
 }

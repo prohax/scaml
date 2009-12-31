@@ -1,33 +1,18 @@
 package org.prohax.scaml
 
-case class ScamlParseResult(params: List[(String, String)], headers: List[String], tagsIncludingEmpty: List[ScamlTag]) {
+case class ScamlParseResult(params: String, tagsIncludingEmpty: List[ScamlTag]) {
   private val tags = tagsIncludingEmpty.filter(!_.isEmpty)
+
   import ScamlParseResult._
-  def render(name: String, imports: List[String]) = """package org.prohax.scaml.output
 
-import scala.xml._
-import org.prohax.scaml.ScamlFile
-""" + (if (imports.isEmpty) "" else "\n" + imports.map("import " + _ + "\n").mkString) + """
-object """ + name + " extends ScamlFile[" + (if (params.isEmpty) "Unit" else "(" + params.map(_._2).mkString(",") + ")") + "] {" + renderHeaders + """
-  def renderXml""" + methodParams(params) + "\n" + renderBody + """
-  }
-}"""
+  def toMethod(name: String) = "def " + name + methodParams + " = {\n" + renderBody + "\n}"
 
-  def methodParams(params: List[(String, String)]) = params match {
-    case Nil => "(t:Unit) = {"
-    case _ => "(t:(" + params.map(_._2).mkString(",") + ")) = t match { case (" + params.map(_._1).mkString(",") + ") =>"
-  }
+  def methodParams = if (params.isEmpty) "" else "(" + params + ")"
 
   private def renderBody = if (tags.isEmpty) {
-    Constants.indent(2) + Constants.EMPTY
+    ""
   } else {
     nestTags(tags).reverseMap(_.toStringWithIndent(2)).mkString("\n")
-  }
-
-  private def renderHeaders = headers match {
-    case Nil => ""
-    case _ => """
-  override def headers = """ + Constants.TRIPLE_QUOTES + headers.mkString("\n") + Constants.TRIPLE_QUOTES + "\n"
   }
 }
 
@@ -38,7 +23,7 @@ object ScamlParseResult {
     case Nil => (parent, Nil)
     case next :: rest => if (next.level > parent.tag.level) {
       val (child, more) = recursiveNest(NestedTag(next, Nil), rest)
-        recursiveNest(NestedTag(parent.tag, child :: parent.subtags), more)
+      recursiveNest(NestedTag(parent.tag, child :: parent.subtags), more)
     } else {
       (parent, remaining)
     }

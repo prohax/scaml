@@ -1,12 +1,4 @@
-package org.prohax.scaml.output
-
-import scala.xml._
-import org.prohax.scaml.ScamlFile
-
-import org.prohax.scaml.models._
-
-object codes extends ScamlFile[Unit] {
-  def renderXml(t:Unit) = {
+def codes = {
     <p>
       Counting to three:
       <ul>
@@ -36,5 +28,4 @@ object codes extends ScamlFile[Unit] {
         } }
       </table>
     </p>
-  }
 }

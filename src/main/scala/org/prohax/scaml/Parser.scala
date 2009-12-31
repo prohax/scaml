@@ -6,20 +6,14 @@ class Parser extends RegexParsers {
   override val whiteSpace = "".r
   val newline = """[\n\r]+""".r
 
-  def start: Parser[ScamlParseResult] = params ~ opt(header) ~ rep(line) ^^ {
-    case params ~ header ~ lines => ScamlParseResult(params, header.map(List(_)).getOrElse(Nil), lines)
+  def start: Parser[ScamlParseResult] = params ~ rep(line) ^^ {
+    case params ~ lines => ScamlParseResult(params, lines)
   }
 
-  def params: Parser[List[(String, String)]] = opt(newline ~> "/!".r ~> opt(" *".r) ~> repsep(param, ",")) ^^ {
-    case None => Nil
+  def params: Parser[String] = opt(newline ~ "/!\\s*".r ~> ".*".r) ^^ {
+    case None => ""
     case Some(x) => x
   }
-
-  def param: Parser[(String, String)] = " *".r ~> """\w+""".r ~ " *: *".r ~ """[\w\[\]\(\)]+""".r <~ " *".r ^^ {
-    case valName ~ sep ~ typeName => (valName, typeName)
-  } 
-
-  def header: Parser[String] = newline ~> "!!!".r ^^ (_ => Constants.DOCTYPE)
 
   def line: Parser[ScamlTag] = newline ~> tagLine
 
@@ -47,9 +41,9 @@ class Parser extends RegexParsers {
 object Parser {
   private val parser = new Parser
 
-  def parse(name: String, imports: List[String], input: String) = {
+  def parse(input: String) : Option[ScamlParseResult] = {
     //need a prepended newline here so each line can consume exactly one. There's probably a better way.
     val parsed = parser.parseAll(parser.start, "\n" + input)
-    if (parsed.successful) parsed.get.render(name, imports) else parsed.toString
+    if (parsed.successful) Some(parsed.get) else None
   }
 }

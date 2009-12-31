@@ -1,12 +1,4 @@
-package org.prohax.scaml.output
-
-import scala.xml._
-import org.prohax.scaml.ScamlFile
-
-import org.prohax.scaml.models._
-
-object literals extends ScamlFile[Unit] {
-  def renderXml(t:Unit) = {
+def literals = {
     <div>
       <h1>Test.</h1>
       <p>
@@ -24,5 +16,4 @@ object literals extends ScamlFile[Unit] {
         cm tall.
       </p>
     </div>
-  }
 }

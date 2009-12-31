@@ -1,12 +1,4 @@
-package org.prohax.scaml.output
-
-import scala.xml._
-import org.prohax.scaml.ScamlFile
-
-import org.prohax.scaml.models._
-
-object complexnesting extends ScamlFile[Unit] {
-  def renderXml(t:Unit) = {
+def complexnesting = {
     <html>
       <head>
         <title/>
@@ -24,5 +16,4 @@ object complexnesting extends ScamlFile[Unit] {
         <div/>
       </body>
     </html>
-  }
 }
