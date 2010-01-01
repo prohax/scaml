@@ -1,8 +1,9 @@
 package org.prohax.scaml
 
 import scala.util.parsing.combinator._
+import syntactical.StdTokenParsers
 
-class Parser extends RegexParsers {
+class Parser extends JavaTokenParsers {
   override val whiteSpace = "".r
   val newline = """[\n\r]+""".r
 
@@ -17,9 +18,11 @@ class Parser extends RegexParsers {
 
   def line: Parser[ScamlTag] = newline ~> tagLine
 
-  def tagLine: Parser[ScamlTag] = rep(indent) ~ opt(tag) ~ rep(cls) ~ opt(id) ~ rep(cls) ~ opt(nontag) ^^
-          {case indents ~ tag ~ cls1 ~ id ~ cls2 ~ nontag =>
-            new ScamlTag(indents.length, tag, id, cls1 ::: cls2, nontag)}
+  def attributes: Parser[String] = "{" ~> "[^}]*".r <~ "}" 
+
+  def tagLine: Parser[ScamlTag] = rep(indent) ~ opt(tag) ~ rep(cls) ~ opt(id) ~ rep(cls) ~ opt(attributes) ~ opt(nontag) ^^
+          {case indents ~ tag ~ cls1 ~ id ~ cls2 ~ attributes ~ nontag =>
+            new ScamlTag(indents.length, tag, id, cls1 ::: cls2, attributes getOrElse "", nontag)}
 
   def indent: Parser[String] = "  ".r
 

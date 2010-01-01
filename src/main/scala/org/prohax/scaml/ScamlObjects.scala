@@ -1,6 +1,6 @@
 package org.prohax.scaml
 
-case class ScamlTag(level: Int, name: Option[String], id: Option[String], classes: List[String], text: Option[NonTag]) {
+case class ScamlTag(level: Int, name: Option[String], id: Option[String], classes: List[String], attributes: String, text: Option[NonTag]) {
   def isEmpty = !isTag && text.isEmpty
 
   def isText = !isTag && !text.isEmpty && text.get.isInstanceOf[Text]
@@ -9,14 +9,15 @@ case class ScamlTag(level: Int, name: Option[String], id: Option[String], classe
 
   def isTag = !(name.isEmpty && id.isEmpty && classes.isEmpty)
 }
+
 object ScamlTag {
-  def apply(level: Int, name: String) = new ScamlTag(level, Some(name), None, Nil, None)
+  def apply(level: Int, name: String) = new ScamlTag(level, Some(name), None, Nil, "", None)
 
-  def apply(level: Int, name: String, id: String) = new ScamlTag(level, Some(name), Some(id), Nil, None)
+  def apply(level: Int, name: String, id: String) = new ScamlTag(level, Some(name), Some(id), Nil, "", None)
 
-  def apply(level: Int, name: String, id: Option[String]) = new ScamlTag(level, Some(name), id, Nil, None)
+  def apply(level: Int, name: String, id: Option[String]) = new ScamlTag(level, Some(name), id, Nil, "", None)
 
-  def apply(level: Int, name: String, id: Option[String], classes: List[String]) = new ScamlTag(level, Some(name), id, classes, None)
+  def apply(level: Int, name: String, id: Option[String], classes: List[String]) = new ScamlTag(level, Some(name), id, classes, "", None)
 }
 
 case class NestedTag(tag: ScamlTag, subtags: List[NestedTag]) {

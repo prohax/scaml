@@ -9,7 +9,7 @@ class ParsingUnitSpec extends Specification {
     def parse(input: String) = parser.parseAll(parser.tagLine, input)
 
     "match empty lines but that's ok" in {
-      parse("").get must beEqualTo(ScamlTag(0, None, None, Nil, None))
+      parse("").get must beEqualTo(ScamlTag(0, None, None, Nil, "", None))
     }
 
     "match simple cases" in {
@@ -40,18 +40,25 @@ class ParsingUnitSpec extends Specification {
     }
 
     "match divs implicitly" in {
-      parse(".header").get must beEqualTo(ScamlTag(0, None, None, List("header"), None))
-      parse("  #main").get must beEqualTo(ScamlTag(1, None, Some("main"), Nil, None))
-      parse("    .main.ima#lol.too").get must beEqualTo(ScamlTag(2, None, Some("lol"), List("main", "ima", "too"), None))
+      parse(".header").get must beEqualTo(ScamlTag(0, None, None, List("header"), "", None))
+      parse("  #main").get must beEqualTo(ScamlTag(1, None, Some("main"), Nil, "", None))
+      parse("    .main.ima#lol.too").get must beEqualTo(ScamlTag(2, None, Some("lol"), List("main", "ima", "too"), "", None))
     }
 
     "match inline text" in {
-      parse("%p.header Header here guys").get must beEqualTo(ScamlTag(0, Some("p"), None, List("header"), Some(Text("Header here guys"))))
-      parse("  %body#main Sup in my body").get must beEqualTo(ScamlTag(1, Some("body"), Some("main"), Nil, Some(Text("Sup in my body"))))
+      parse("%p.header Header here guys").get must beEqualTo(ScamlTag(0, Some("p"), None, List("header"), "", Some(Text("Header here guys"))))
+      parse("  %body#main Sup in my body").get must beEqualTo(ScamlTag(1, Some("body"), Some("main"), Nil, "", Some(Text("Sup in my body"))))
     }
 
     "match block text" in {
-      parse("    some text here").get must beEqualTo(ScamlTag(2, None, None, Nil, Some(Text("some text here"))))
+      parse("    some text here").get must beEqualTo(ScamlTag(2, None, None, Nil, "", Some(Text("some text here"))))
+    }
+  }
+
+  "parsing attributes" should {
+    def parse(input: String) = parser.parseAll(parser.tagLine, input)
+    "handle empties" in {
+      parse("%p{}").get must_== ScamlTag(0, Some("p"), None, Nil, "", None)
     }
   }
 
@@ -96,9 +103,9 @@ class ParsingUnitSpec extends Specification {
   %h1 Hello there.
   %p.byline Lolfase.""")
       parsed.get must beEqualTo(ScamlParseResult("", List(
-        ScamlTag(0, Some("div"), None, Nil, None),
-        ScamlTag(1, Some("h1"), None, Nil, Some(Text("Hello there."))),
-        ScamlTag(1, Some("p"), None, List("byline"), Some(Text("Lolfase.")))
+        ScamlTag(0, Some("div"), None, Nil, "", None),
+        ScamlTag(1, Some("h1"), None, Nil, "", Some(Text("Hello there."))),
+        ScamlTag(1, Some("p"), None, List("byline"), "", Some(Text("Lolfase.")))
         )))
     }
 
@@ -108,9 +115,9 @@ class ParsingUnitSpec extends Specification {
   %h1 Hello there.
     Lolfase.""")
       parsed.get must beEqualTo(ScamlParseResult("", List(
-        ScamlTag(0, Some("div"), None, Nil, None),
-        ScamlTag(1, Some("h1"), None, Nil, Some(Text("Hello there."))),
-        ScamlTag(2, None, None, Nil, Some(Text("Lolfase.")))
+        ScamlTag(0, Some("div"), None, Nil, "", None),
+        ScamlTag(1, Some("h1"), None, Nil, "", Some(Text("Hello there."))),
+        ScamlTag(2, None, None, Nil, "", Some(Text("Lolfase.")))
         )))
     }
   }

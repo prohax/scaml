@@ -3,7 +3,6 @@ package org.prohax.scaml
 object Constants {
   val TRIPLE_QUOTES = "\"\"\""
 
-  def escape(s: String) = "Text(" + Constants.TRIPLE_QUOTES + s + Constants.TRIPLE_QUOTES + ")"
   def indent(indentLevel: Int) = "  " * indentLevel
 
   def closingBrackets(s: String) = findUnclosedBrackets("", s.toCharArray.toList).toCharArray.toList.reverseMap(closers(_)).mkString
