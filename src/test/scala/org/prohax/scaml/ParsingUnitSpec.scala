@@ -57,8 +57,15 @@ class ParsingUnitSpec extends Specification {
 
   "parsing attributes" should {
     def parse(input: String) = parser.parseAll(parser.tagLine, input)
+    def pWithAttr(attr : String) = ScamlTag(0, Some("p"), None, Nil, attr, None)
     "handle empties" in {
-      parse("%p{}").get must_== ScamlTag(0, Some("p"), None, Nil, "", None)
+      parse("%p{}").get must_== pWithAttr("")
+    }
+    "pass anything through directly" in {
+      parse("%p{name=\"top\"}").get must_== pWithAttr("name=\"top\"")
+    }
+    "pass anything else through directly" in {
+      parse("%p{name={\"top\"}}").get must_== pWithAttr("name=\"top\"")
     }
   }
 

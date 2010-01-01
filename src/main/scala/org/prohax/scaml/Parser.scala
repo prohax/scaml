@@ -4,6 +4,20 @@ import scala.util.parsing.combinator._
 import syntactical.StdTokenParsers
 
 class Parser extends JavaTokenParsers {
+  def plus(p : Parser[~[String, String]]) = p ^^ { case (a ~ b) => a + " " + b }
+  def plusOpt(p : Parser[~[Option[String], Option[String]]]) = p ^^ { x => x match {
+      case (Some(a) ~ Some(b)) => a + " " + b
+      case (Some(a) ~ None) => a
+      case (None ~ Some(b)) => b 
+      case (None ~ None) => ""
+    }
+  }
+  def plus3(p : Parser[~[~[String, String], String]]) = p ^^ { case ((a ~ b) ~ c) => a + " " + b + " " + c }
+  def sum(p : Parser[List[String]], sep : String) = p ^^ { x => x match {
+    case Nil => ""
+    case xs => xs.reduceLeft(_+sep+_)}
+  }
+
   override val whiteSpace = "".r
   val newline = """[\n\r]+""".r
 
@@ -18,7 +32,12 @@ class Parser extends JavaTokenParsers {
 
   def line: Parser[ScamlTag] = newline ~> tagLine
 
-  def attributes: Parser[String] = "{" ~> "[^}]*".r <~ "}" 
+  def notBrace: Parser[String] = "[^{^}]+".r
+
+  def attributes: Parser[String] = "{" ~>
+          ((opt(notBrace) ~ opt(attributes) ~ opt(notBrace)) ^^ {case (a ~ b ~ c) =>
+            (a getOrElse "") + (b getOrElse "") + (c getOrElse "")
+          }) <~ "}"
 
   def tagLine: Parser[ScamlTag] = rep(indent) ~ opt(tag) ~ rep(cls) ~ opt(id) ~ rep(cls) ~ opt(attributes) ~ opt(nontag) ^^
           {case indents ~ tag ~ cls1 ~ id ~ cls2 ~ attributes ~ nontag =>
