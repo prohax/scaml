@@ -65,7 +65,7 @@ class ParsingUnitSpec extends Specification {
       parse("%p{name=\"top\"}").get must_== pWithAttr("name=\"top\"")
     }
     "pass anything else through directly" in {
-      parse("%p{name={\"top\"}}").get must_== pWithAttr("name=\"top\"")
+      parse("%p{name={\"top\"}}").get must_== pWithAttr("name={\"top\"}")
     }
   }
 

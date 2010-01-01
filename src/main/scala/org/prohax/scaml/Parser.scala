@@ -35,7 +35,7 @@ class Parser extends JavaTokenParsers {
   def notBrace: Parser[String] = "[^{^}]+".r
 
   def attributes: Parser[String] = "{" ~>
-          ((opt(notBrace) ~ opt(attributes) ~ opt(notBrace)) ^^ {case (a ~ b ~ c) =>
+          ((opt(notBrace) ~ (opt(attributes) ^^ (p => p map ("{" + _ + "}"))) ~ opt(notBrace)) ^^ {case (a ~ b ~ c) =>
             (a getOrElse "") + (b getOrElse "") + (c getOrElse "")
           }) <~ "}"
 
