@@ -34,10 +34,11 @@ class Parser extends JavaTokenParsers {
 
   def notBrace: Parser[String] = "[^{^}]+".r
 
+  def x = opt(attributes) ^^ (p => p map ("{" + _ + "}"))
   // Matches any content between {}, including matched braces.
   def attributes: Parser[String] = "{" ~>
-          ((opt(notBrace) ~ (opt(attributes) ^^ (p => p map ("{" + _ + "}"))) ~ opt(notBrace)) ^^ {case (a ~ b ~ c) =>
-            (a getOrElse "") + (b getOrElse "") + (c getOrElse "")
+          ((opt(notBrace) ~ x ~ opt(notBrace)) ~ x ~ opt(notBrace) ^^ {case (a ~ b ~ c ~ d ~ e) =>
+            List(a,b,c,d,e) map (_ getOrElse "") reduceLeft (_ + _)
           }) <~ "}"
 
   def tagLine: Parser[ScamlTag] = rep(indent) ~ opt(tag) ~ rep(cls) ~ opt(id) ~ rep(cls) ~ opt(attributes) ~ opt(nontag) ^^

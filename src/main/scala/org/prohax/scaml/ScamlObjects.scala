@@ -1,5 +1,7 @@
 package org.prohax.scaml
 
+import Constants._
+
 case class ScamlTag(level: Int, name: Option[String], id: Option[String], classes: List[String], attributes: String, text: Option[NonTag]) {
   def isEmpty = !isTag && text.isEmpty
 
@@ -33,7 +35,7 @@ case class NestedTag(tag: ScamlTag, subtags: List[NestedTag]) {
           "{ " + code + {
             if (subtags.isEmpty) "" else
               "\n" + subtags.reverseMap(_.toStringWithIndent(indent + 1)).mkString("\n") + "\n" + Constants.indent(indent)
-          } + Constants.closingBrackets(code) + " }"
+          } + closingBrackets(code) + " }"
         } else {
           val name = tag.name.getOrElse("div")
           val within = tag.text.map(_.toInlineString).getOrElse({
