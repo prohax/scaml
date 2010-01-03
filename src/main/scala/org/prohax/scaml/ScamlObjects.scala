@@ -42,18 +42,25 @@ case class NestedTag(tag: ScamlTag, subtags: List[NestedTag]) {
             if (subtags.isEmpty) "" else
               "\n" + subtags.reverseMap(_.toStringWithIndent(indent + 1)).mkString("\n") + "\n" + Constants.indent(indent)
           })
-          if (within.isEmpty) "<" + name + attrs + "/>" else {
-            "<" + name + attrs + ">" + within + "</" + name + ">"
+          val attributeContent = if (attrs.isEmpty) "" else " " + attrs
+          if (within.isEmpty) "<" + name + attributeContent + "/>" else {
+            "<" + name + attributeContent + ">" + within + "</" + name + ">"
           }
         }
       }
     }
   }
 
-  private def attrs = tag.id.map(id => " id='" + id + "'").getOrElse("") + (tag.classes match {
-    case Nil => ""
-    case classes => " class='" + classes.mkString(" ") + "'"
-  })
+  lazy val attrs = {
+//    val x = {
+//      tag.id.map(id => " id='" + id + "'").getOrElse("") + (tag.classes match {
+//        case Nil => ""
+//        case classes => " class=\"" + classes.mkString(" ") + "\""
+//      })
+//    }
+    val toAdd = tag.id.map(id => "id" -> id) ++ (if (tag.classes.isEmpty) None else Some("class" -> tag.classes.mkString(" ")))
+    Util.addIfMissing(tag.attributes, toAdd)
+  }
 }
 
 sealed abstract case class NonTag(s: String) {
@@ -63,5 +70,5 @@ case class Text(text: String) extends NonTag(text) {
   def toInlineString = s
 }
 case class Code(code: String) extends NonTag(code) {
-  def toInlineString = "{ " + s + " }"  
+  def toInlineString = "{ " + s + " }"
 }

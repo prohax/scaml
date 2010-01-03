@@ -3,11 +3,11 @@ def literals = {
       <h1>Test.</h1>
       <p>
         Welcome, Mr
-        <span class='bold'>Boldfase</span>
+        <span class="bold">Boldfase</span>
       </p>
       <p>
         You are
-        <span class='red'>{ 20 + 5 }</span>
+        <span class="red">{ 20 + 5 }</span>
         years old.
       </p>
       <p>
