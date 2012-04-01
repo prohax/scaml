@@ -5,3 +5,5 @@ project/build/target
 .idea/misc.xml
 lib_managed
 .idea/*
+*.iml
+
