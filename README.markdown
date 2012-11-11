@@ -19,7 +19,7 @@ This is rendered to the following Scala source file:
 	import scala.xml._
 	import org.prohax.scaml.ScamlFile
 
-	import org.prohax.scaml.models._
+	import example.models._
 
 	object literals extends ScamlFile[Unit] {
 	  def renderXml(t:Unit) = {

@@ -5,7 +5,7 @@ import scala.io.Source
 import java.io.File
 import scala.xml.Xhtml
 
-import org.prohax.scaml.models._
+import example.models._
 
 object ScamlTagSpec extends Specification {
   "ScamlTag" should {

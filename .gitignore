@@ -4,3 +4,6 @@ project/build/target
 .idea/workspace.xml
 .idea/misc.xml
 lib_managed
+.idea/*
+*.iml
+
